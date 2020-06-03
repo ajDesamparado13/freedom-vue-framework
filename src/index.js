@@ -1,21 +1,45 @@
-//import router from './router'
-import vuex from './vuex'
-import utilities from './utilities'
-import resource from './resource'
-import dependencies from './dependencies'
-import router from './router';
 
-const installer = {};
-installer.install = (Vue,options) => {
-    Vue.use(utilities,options.config)
-    Vue.use(dependencies);
-    Vue.use(resource,options.resource)
-    Vue.use(vuex,options.vuex)
-    Vue.use(router,options.router)
+import Vue from 'vue';
+import bootstrap from './bootstrapper'
+import preloadStore from './preload-store'
+
+export default function initialize(VueOptions={},{
+    vuex={},
+    router={},
+
+})  {
+
+    //CONFIGURE VUEX
+    vuex.attachTo = VueOptions;
+    vuex.modules['Preload'] = preloadStore;
+    vuex.persistLocal.paths.push('Preload');
+
+    router.attachTo = VueOptions;
+
+    Vue.use(bootstrap,{ vuex,router });
+
+    const preload = JSON.parse(localStorage.getItem('preload'));
+
+    if(preload){
+        VueOptions.store.commit('Preload/set',preload.data);
+    }
+
+    setTimeout(()=>{
+        localStorage.removeItem('preload');
+        window.localStorage.removeItem('preload')
+        delete localStorage.preload
+    },1000)
+
+    const app = new Vue(VueOptions);
+    VueOptions.router.onReady(()=>{
+        app.$mount(VueOptions.el);
+    })
+
+    //ADD GLOBAL ACCESS FOR DEBUGGING IN NON PRODUCTION ENVIRONMENT
+    if(process.env.MIX_APP_ENV != 'production'){
+        window.store = VueOptions.store;
+    }
+    window.Vue = Vue;
+
+    return app;
 }
-
-if(typeof window != 'undefined' && window.Vue){
-    window.Vue.use(installer);
-}
-
-export default installer
