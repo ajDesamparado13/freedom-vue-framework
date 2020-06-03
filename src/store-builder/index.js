@@ -2,7 +2,7 @@ import _actions from './actions'
 import _getters from './getters'
 import _mutations from './mutations'
 import _state from './state'
-import _auth from './auth'
+//import _auth from './auth'
 
 /*
 * BASE DEFINITION OF STORE FROM BUILDER
@@ -42,8 +42,8 @@ export function build(store={},config={}){
     return store;
 }
 
-export function auth_builder(store={},config={}){
-    return _auth;
-}
+//export function auth_builder(store={},config={}){
+//    return _auth;
+//}
 
 export default build;
