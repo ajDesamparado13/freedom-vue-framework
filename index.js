@@ -1,3 +1,3 @@
-import src from './src/bootstrapper'
+import src from './src'
 
 export default src;
