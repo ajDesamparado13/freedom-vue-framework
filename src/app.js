@@ -3,31 +3,25 @@ import Vue from 'vue';
 import framework from '@framework'
 import preloadStore from './preload-store'
 
-export default function initialize(AppComponent,{
-    options={},
+export default function initialize(VueOptions={},{
     vuex={},
     router={},
 
 })  {
 
-    var options = {
-        el: '#main',
-        render: h => h(AppComponent)
-    }
-
     //CONFIGURE VUEX
-    vuex.attachTo = options;
+    vuex.attachTo = VueOptions;
     vuex.modules['Preload'] = preloadStore;
     vuex.persistLocal.paths.push('Preload');
 
-    router.attachTo = options;
+    router.attachTo = VueOptions;
 
     Vue.use(framework,{ vuex,router });
 
     const preload = JSON.parse(localStorage.getItem('preload'));
 
     if(preload){
-        options.store.commit('Preload/set',preload.data);
+        VueOptions.store.commit('Preload/set',preload.data);
     }
 
     setTimeout(()=>{
@@ -36,14 +30,14 @@ export default function initialize(AppComponent,{
         delete localStorage.preload
     },1000)
 
-    const app = new Vue(options);
-    options.router.onReady(()=>{
-        app.$mount(options.el);
+    const app = new Vue(VueOptions);
+    VueOptions.router.onReady(()=>{
+        app.$mount(VueOptions.el);
     })
 
     //ADD GLOBAL ACCESS FOR DEBUGGING IN NON PRODUCTION ENVIRONMENT
     if(process.env.MIX_APP_ENV != 'production'){
-        window.store = options.store;
+        window.store = VueOptions.store;
     }
     window.Vue = Vue;
 
