@@ -35,7 +35,7 @@ const file = {
     },
 }
 
-export default(model={},{resource=null}){
+export default function (model={},{resource=null}) {
     if(resource === null){
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
