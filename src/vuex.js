@@ -1,15 +1,17 @@
 import Vuex from 'vuex'
 import * as Cookies from 'js-cookie'
 import createPersistedState from 'vuex-persistedstate'
+import preloadStore from './preload-store'
 //const debug = process.env.NODE_ENV !== 'production'
 const debug = false
 
 const vuex_dependency = {
     install : (Vue,options) => {
-
         Vue.use(Vuex)
         var modules = options.modules;
+        modules['Preload'] = preloadStore;
         var persistLocal = options.persistLocal;
+        persistLocal.paths.push('Preload');
         var persistSession = options.persistSession;
         var attachTo = options.attachTo;
 

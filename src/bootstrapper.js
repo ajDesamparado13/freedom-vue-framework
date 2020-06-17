@@ -1,17 +1,22 @@
-//import router from './router'
-import vuex from './vuex'
-import utilities from './utilities'
-import resource from './resource'
-import dependencies from './dependencies'
-import router from './router';
+import _config from './config'
+import _vuex from './vuex'
+import _utilities from './utilities'
+import _resource from './resource'
+import _dependencies from './dependencies'
+import _router from './router';
 
 const installer = {};
-installer.install = (Vue,options) => {
-    Vue.use(utilities,options.config)
-    Vue.use(dependencies);
-    Vue.use(resource,options.resource)
-    Vue.use(vuex,options.vuex)
-    Vue.use(router,options.router)
+installer.install = (Vue,{attachTo={},config={},resource={},router={},vuex={},dependencies={},utilities={}}) => {
+    vuex.attachTo = attachTo;
+    router.attachTo = attachTo;
+
+    Vue.use(_config,config)
+    Vue.use(_utilities,utilities)
+
+    Vue.use(_dependencies,dependencies);
+    Vue.use(_resource,resource)
+    Vue.use(_vuex,vuex)
+    Vue.use(_router,router)
 }
 
 if(typeof window != 'undefined' && window.Vue){

@@ -1,23 +1,11 @@
-
 import Vue from 'vue';
 import bootstrap from './bootstrapper'
-import preloadStore from './preload-store'
 
-export default function initialize(VueOptions={},{
-    vuex={},
-    router={},
-
-})  {
+export default function initialize(VueOptions={},configuration={})  {
 
     //CONFIGURE VUEX
-    vuex.attachTo = VueOptions;
-    vuex.modules['Preload'] = preloadStore;
-    vuex.persistLocal.paths.push('Preload');
-
-    router.attachTo = VueOptions;
-
-    Vue.use(bootstrap,{ vuex,router });
-
+    configuration.attachTo = VueOptions;
+    Vue.use(bootstrap, configuration);
     const preload = JSON.parse(localStorage.getItem('preload'));
 
     if(preload){
