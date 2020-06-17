@@ -51,15 +51,22 @@ const listing = function() {
     };
 };
 
-const record = function (){
-    var model = {
+const record = function (config={}){
+    const original = config.model || null
+
+    return {
         set : ( state ,payload) => {
             for(let key in payload){
                 state[key] = payload[key];
             }
+        },
+        clear : ( state ){
+            let model = typeof original === 'object' ? original : state
+            for(let key in model){
+                state[key] = null;
+            }
         }
     }
-    return model;
 }
 
 export default { listing,record };
