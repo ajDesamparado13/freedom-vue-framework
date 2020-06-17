@@ -1,8 +1,6 @@
-import config from './config'
 import response from './response'
 
 const HelperUtility = {
-    config,
     response,
 }
 
