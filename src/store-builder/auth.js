@@ -12,7 +12,7 @@ export default function(config={}){
 
     return {
         namespaced:true,
-        state = {
+        state : {
             authenticated: false,
             profile,
             token: null,
