@@ -46,45 +46,6 @@ const resource_dependency = {
         http.defaults.baseURL = Vue._config.app_url
         http.defaults.headers.common.Accept =  "application/json"
 
-        //    //DISPLAY RETURNED MESSAGE FROM API
-        var notification = (response)=>{
-            //var data = response.data;
-            //if(data.message && data.display && !data.await){
-            //    var display = data.display.split('|');
-            //    var type = display[1];
-
-            //    switch(type){
-            //        case 'successful':
-            //        case 'success':
-            //            type = "info"
-            //            break;
-            //        case 'failed':
-            //        case 'fail':
-            //        case 'error':
-            //            type = "error"
-            //            break;
-            //    }
-
-            //    switch(display[0]){
-            //        case 'alert':
-            //        case 'notification': Vue.prototype.$notification.show({ message:data.message,type });break;
-            //        case 'toast': Vue.prototype.$toast.show({ message:data.message,type });break;
-            //    }
-            //}
-        }
-        http.interceptors.request.use((request)=>{
-            return request;
-        },(error)=>{
-            return Promise.reject(error);
-        });
-        http.interceptors.response.use(response=>{
-            return response;
-        },error=>{
-            notification(error.response);
-            return Promise.reject(error.response)
-
-        })
-
         Vue.http = http;
         Vue.prototype.$http = http
         Vue.use(http)
