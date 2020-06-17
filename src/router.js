@@ -13,7 +13,7 @@ router_dependency.install = (Vue,options) => {
     var scroll = {x:0,y:0}
 
     var base = ""
-    var suffix = options.base;
+    var suffix = options.base || "";
 
     const domain = Vue._config.app_domain;
     const url = Vue._config.app_url;
@@ -29,8 +29,9 @@ router_dependency.install = (Vue,options) => {
             base = base.replace('http://','');
             base = base.substring(base.indexOf('/')+1,base.length);
         }
-        base += suffix;
     }
+
+    base += suffix;
 
     const scrollBehavior = (to,from,next)=>{
         return scroll;
