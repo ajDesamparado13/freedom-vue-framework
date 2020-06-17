@@ -60,7 +60,7 @@ const record = function (config={}){
                 state[key] = payload[key];
             }
         },
-        clear : ( state ){
+        clear : ( state ) => {
             let model = typeof original === 'object' ? original : state
             for(let key in model){
                 state[key] = null;
