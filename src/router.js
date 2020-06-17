@@ -1,3 +1,4 @@
+import routerPipeline from './routerPipeline'
 
 import VueRouter from 'vue-router'
 
@@ -47,6 +48,16 @@ router_dependency.install = (Vue,options) => {
         linkActiveClass: 'active',
         scrollBehavior,
     })
+    router.beforeEach((to,from,next) => {
+        if(!to.meta.middleware){
+            return next();
+        }
+
+        const middlewares = Array.isArray(to.meta.middleware) ? to.meta.middleware : [ to.meta.middleware];
+        const context = { to,from,next,store:attachTo.store}
+        return middlewares[0]({...context,next:routerPipeline(context,middlewares,1)});
+
+    });
     attachTo.router = router;
 }
 
