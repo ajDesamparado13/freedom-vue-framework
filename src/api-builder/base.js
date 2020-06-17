@@ -6,6 +6,34 @@
 
 import Vue from 'vue';
 const querifyable = ['search','with','searchFields','searchJoin','filter','sortedBy','orderBy'];
+const file = {
+    download(res,file_name=""){
+        var blob = res;
+        if(res && typeof res.blob == 'function' ){
+            res.blob().then(n_blob=>{
+                this.load_file(n_blob,file_name);
+            })
+        }else{
+            this.load_file(blob,file_name);
+        }
+
+    },
+    load_file(blob,file_name){
+        if(window.navigator.msSaveBlob){
+            window.navigator.msSaveOrOpenBlob(blob,file_name);
+        }else{
+            //var blob = new Blob([new Uint8Array(byteArray)],{type:'text/csv;charset=UTF-16LE'});
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = file_name;
+            document.body.appendChild(link);
+            link.target="_self";
+            link.style.display='none';
+            link.click();
+            document.body.removeChild(link);
+        }
+    },
+}
 export default {
     /*
     * EXECUTE A GENERIC API REQUEST
@@ -90,6 +118,10 @@ export default {
         }
         return Vue.http.put(`${url}`,payload,{headers});
     },
+    download(url,payload={},params=null){
+
+        return file.download(Vue.http.post(url,payload,{responseType:"blob"}));
+    }
     /*
     * DOWNLOAD FROM API
     * Intended for download
