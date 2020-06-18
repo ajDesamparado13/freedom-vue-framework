@@ -51,11 +51,15 @@ router_dependency.install = (Vue,options) => {
         scrollBehavior,
     })
 
+    let beforeEachList = []
+    let afterEachList = []
+
     router.beforeEach((to,from,next,router) => {
 
-        if(typeof beforeEach === 'function'){
-            beforeEach(to,from,next,router);
+        for(let key in beforeEachList){
+            beforeEachList[key](to,from,next,router);
         }
+
 
         let matched = to.matched;
         let hasMiddleware =  !!to.meta.middleware ||  matched.some(record => record.meta.middleware)
@@ -81,11 +85,18 @@ router_dependency.install = (Vue,options) => {
     });
 
     router.afterEach((router) => {
-        if(typeof afterEach == 'function'){
-            afterEach(router);
+        for(let key in afterEachList){
+            afterEachList[key](router);
         }
     })
 
+    router.appendBeforeEach = (middleware)=> {
+        beforeEachList.push(middleware);
+    }
+
+    router.appendAfterEach = (middleware)=> {
+        afterEachList.push(middleware);
+    }
 
     attachTo.router = router;
 }
