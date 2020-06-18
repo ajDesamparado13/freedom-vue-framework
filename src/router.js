@@ -11,8 +11,6 @@ router_dependency.install = (Vue,options) => {
 
     var routes = options.routes;
     var attachTo = options.attachTo;
-    var afterEach = options.afterEach;
-    let beforeEach = options.beforeEach;
     var scroll = {x:0,y:0}
 
     var base = ""
