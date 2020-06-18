@@ -57,11 +57,24 @@ router_dependency.install = (Vue,options) => {
             beforeEach(to,from,next,router);
         }
 
-        if(!to.meta.middleware){
+        let matched = to.matched;
+        let hasMiddleware =  !!to.meta.middleware ||  matched.some(record => record.meta.middleware)
+
+        if(!hasMiddleware){
             return next();
         }
 
-        const middlewares = Array.isArray(to.meta.middleware) ? to.meta.middleware : [ to.meta.middleware];
+        let middlewares = [];
+
+        for(let matches in matched){
+            let match = matched[matches]
+
+            if(typeof match.meta.middleware != 'undefined'){
+                middlewares = middlewares.concat(Array.isArray(match.meta.middleware) ? match.meta.middleware : [ match.meta.middleware])
+
+            }
+
+        }
         const context = { to,from,next,store:attachTo.store}
         return middlewares[0]({...context,next:routerPipeline(context,middlewares,1)});
 
