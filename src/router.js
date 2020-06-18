@@ -11,6 +11,8 @@ router_dependency.install = (Vue,options) => {
 
     var routes = options.routes;
     var attachTo = options.attachTo;
+    var afterEach = options.afterEach;
+    let beforeEach = options.beforeEach;
     var scroll = {x:0,y:0}
 
     var base = ""
@@ -48,7 +50,12 @@ router_dependency.install = (Vue,options) => {
         linkActiveClass: 'active',
         scrollBehavior,
     })
-    router.beforeEach((to,from,next) => {
+    router.beforeEach((to,from,next,next) => {
+
+        if(typeof beforeEach === 'function'){
+            beforeEach(to,from,next,router);
+        }
+
         if(!to.meta.middleware){
             return next();
         }
@@ -58,6 +65,14 @@ router_dependency.install = (Vue,options) => {
         return middlewares[0]({...context,next:routerPipeline(context,middlewares,1)});
 
     });
+
+    router.afterEach((router) => {
+        if(typeof afterEach == 'function'){
+            afterEach(router);
+        }
+    })
+
+
     attachTo.router = router;
 }
 
