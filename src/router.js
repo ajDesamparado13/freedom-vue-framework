@@ -50,7 +50,8 @@ router_dependency.install = (Vue,options) => {
         linkActiveClass: 'active',
         scrollBehavior,
     })
-    router.beforeEach((to,from,next,next) => {
+
+    router.beforeEach((to,from,next,router) => {
 
         if(typeof beforeEach === 'function'){
             beforeEach(to,from,next,router);
