@@ -48,6 +48,14 @@ export default function (model={},{resource=null,http=null}) {
         getResource(){
             return this.getPrefix() + this.api_resource;
         },
+        getHttp(){
+            let res = http || Vue.http;
+            if(res === null){
+                console.error('A HTTP UTILITY IS REQUIRED')
+                throw 'A HTTP UTILITY IS REQUIRED'
+            }
+            return res;
+        },
         /*
         * EXECUTE A GENERIC API REQUEST
         */
@@ -59,7 +67,7 @@ export default function (model={},{resource=null,http=null}) {
 
             path = path ? "/"+path : "";
             var url = `${this.getResource()}${path}${queryString}`;
-            return Vue.http[method](url,{timeout:0});
+            return this.getHttp()[method](url,{timeout:0});
         },
         /*
         * SEND GET REQUEST TO  API INDEX
@@ -68,7 +76,7 @@ export default function (model={},{resource=null,http=null}) {
         index(params="",config={}){
             var headers = config['headers'] || {}
             var url = `${this.getResource()}${this.getQueryString(params)}`;
-            return Vue.http.get(url,{timeout:0,headers},);
+            return this.getHttp().get(url,{timeout:0,headers},);
         },
         /*
         * SEND POST REQUEST TO  API INDEX
@@ -82,7 +90,7 @@ export default function (model={},{resource=null,http=null}) {
             }
 
             var url = `${this.getResource()}${this.getQueryString(params)}`;
-            return Vue.http.post(`${url}`,payload,{ headers });
+            return this.getHttp().post(`${url}`,payload,{ headers });
         },
         /*
         * SEND DELETE REQUEST TO  API INDEX
@@ -91,7 +99,7 @@ export default function (model={},{resource=null,http=null}) {
         destroy(id,params="", config={} ){
             var headers = config['headers'] || {}
             var url = `${this.getResource()}/${id}${this.getQueryString(params)}`;
-            return Vue.http.delete(`${url}`,{headers});
+            return this.getHttp().delete(`${url}`,{headers});
         },
         /*
         * SEND PUT REQUEST TO  API INDEX
@@ -103,9 +111,9 @@ export default function (model={},{resource=null,http=null}) {
 
             if(this.form_methods.includes('update')){
                 payload = this.getFormData(payload,'PUT')
-                return Vue.http.post(`${url}`,payload,{headers});
+                return this.getHttp().post(`${url}`,payload,{headers});
             }
-            return Vue.http.put(`${url}`,payload,{headers});
+            return this.getHttp().put(`${url}`,payload,{headers});
         },
         /*
         * SEND GET REQUEST TO  API SHOW
@@ -114,12 +122,12 @@ export default function (model={},{resource=null,http=null}) {
         show(id,params="",config={}){
             var headers = config['headers'] || {}
             var url = `${this.getResource()}/${id}${this.getQueryString(params)}`;
-            return Vue.http.get(`${url}`,{headers});
+            return this.getHttp().get(`${url}`,{headers});
         },
         self(params="",config={}){
             var headers = config['headers'] || {}
             var url = `${this.getResource()}/self${this.getQueryString(params)}`;
-            return Vue.http.get(`${url}`,{headers});
+            return this.getHttp().get(`${url}`,{headers});
         },
         selfUpdate(payload, params="", config={} ){
             var headers = config['headers'] || {}
@@ -127,9 +135,9 @@ export default function (model={},{resource=null,http=null}) {
 
             if(this.form_methods.includes('update')){
                 payload = this.getFormData(payload,'PUT')
-                return Vue.http.post(`${url}`,payload,{headers});
+                return this.getHttp().post(`${url}`,payload,{headers});
             }
-            return Vue.http.put(`${url}`,payload,{headers});
+            return this.getHttp().put(`${url}`,payload,{headers});
         },
         /*
         * DOWNLOAD FROM API
@@ -137,7 +145,7 @@ export default function (model={},{resource=null,http=null}) {
         */
         download(url,payload={},params=null){
 
-            return file.download(Vue.http.post(url,payload,{responseType:"blob"}));
+            return file.download(this.getHttp().post(url,payload,{responseType:"blob"}));
         },
         /*
         * UPLOAD PAYLOAD INTO API
@@ -147,7 +155,7 @@ export default function (model={},{resource=null,http=null}) {
             var headers = config['headers'] || {}
             var fdata = this.getFormData(payload);
             var url = `${this.getResource()}/upload${this.getQueryString(params)}`;
-            return Vue.http.post(`${url}`,fdata);
+            return this.getHttp().post(`${url}`,fdata);
         },
         /*
         * TRANSFORM A REQUEST PAYLOAD INTO FORM DATA PAYLOAD
