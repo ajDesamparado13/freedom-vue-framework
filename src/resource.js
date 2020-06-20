@@ -24,7 +24,7 @@ const resource_dependency = {
         const app_token = document.getElementsByName('x-app-token')[0]
         if(app_token){
             http.defaults.headers.common['X-APP-TOKEN'] = app_token.getAttribute('content')
-            removeElement(csrf);
+            removeElement(app_token);
         }
 
         //SETUP HEADERS
