@@ -35,7 +35,7 @@ const file = {
     },
 }
 
-export default function (model={},{resource=null}) {
+export default function (model={},{resource=null,http=null}) {
     if(resource === null){
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
@@ -43,7 +43,7 @@ export default function (model={},{resource=null}) {
     return Object.assign({
         api_resource:resource,
         getPrefix(){
-            return Vue._config.app_prefix;
+            return Vue._config.api_prefix;
         },
         getResource(){
             return this.getPrefix() + this.api_resource;
