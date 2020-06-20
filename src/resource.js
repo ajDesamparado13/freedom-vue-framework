@@ -1,3 +1,4 @@
+import {removeElement} from './helpers'
 import axios from 'axios'
 
 const resource_dependency = {
@@ -16,14 +17,14 @@ const resource_dependency = {
         const csrf = document.getElementsByName('x-csrf-token')[0]
         if(csrf){
             http.defaults.headers.common['X-CSRF-TOKEN'] = csrf.getAttribute('content')
-            csrf.remove();
+            removeElement(csrf);
         }
 
         //SET X-APP-TOKEN IN HEADERS
         const app_token = document.getElementsByName('x-app-token')[0]
         if(app_token){
             http.defaults.headers.common['X-APP-TOKEN'] = app_token.getAttribute('content')
-            app_token.remove();
+            removeElement(csrf);
         }
 
         //SETUP HEADERS
