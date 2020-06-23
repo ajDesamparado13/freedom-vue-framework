@@ -64,21 +64,12 @@ export default function(config={}){
                 Vue.bus.emit('logout')
             },
             check(context, payload) {
-                return new Promise((resolve,reject)=>{
+                return new Promise( async (resolve,reject)=>{
                     if(context.state.authenticated) {
-                        api.check(success=>{
-                            if(context.state.authenticated) {
-                                context.commit('set', payload)
-                                resolve();
-                            }
-                        },error=>{
-                            //todo: change code when has more user types
-                            if(context.state.authenticated != true){
-                                context.commit('remove')
-                                Vue.bus.emit('logout')
-                                reject();
-                            }
-                        })
+                        try{
+                            let response = await api.check();
+                        }catch(error){
+                        }
                     }
                     resolve();
                 })
