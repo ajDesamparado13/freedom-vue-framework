@@ -10,6 +10,8 @@ const vuex_dependency = {
         Vue.use(Vuex)
         var modules = options.modules;
         modules['Preload'] = preloadStore;
+
+
         var persistLocal = options.persistLocal;
         persistLocal.paths.push('Preload');
         var persistSession = options.persistSession;
@@ -38,6 +40,25 @@ const vuex_dependency = {
                 createPersistedState(persistSession),
             ]
         })
+
+        const preload = JSON.parse(localStorage.getItem('preload'));
+
+        if(preload){
+            for(let key in preload){
+                if(modules[key]){
+                    let data = preload[key];
+                    store.commit(`${key}/set`,data);
+                    delete(preload[key])
+                }
+            }
+            store.commit('Preload/set',preload.data);
+        }
+
+        setTimeout(()=>{
+            localStorage.removeItem('preload');
+            window.localStorage.removeItem('preload')
+            delete localStorage.preload
+        },1000)
 
         attachTo.store = store;
     }

@@ -14,8 +14,8 @@ installer.install = (Vue,{attachTo={},config={},resource={},router={},vuex={},de
     Vue.use(_utilities,utilities)
 
     Vue.use(_dependencies,dependencies);
-    Vue.use(_resource,resource)
     Vue.use(_vuex,vuex)
+    Vue.use(_resource,resource)
     Vue.use(_router,router)
 }
 

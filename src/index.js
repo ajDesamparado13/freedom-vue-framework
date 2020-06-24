@@ -6,17 +6,6 @@ export default function initialize(VueOptions={},configuration={})  {
     //CONFIGURE VUEX
     configuration.attachTo = VueOptions;
     Vue.use(bootstrap, configuration);
-    const preload = JSON.parse(localStorage.getItem('preload'));
-
-    if(preload){
-        VueOptions.store.commit('Preload/set',preload.data);
-    }
-
-    setTimeout(()=>{
-        localStorage.removeItem('preload');
-        window.localStorage.removeItem('preload')
-        delete localStorage.preload
-    },1000)
 
     const app = new Vue(VueOptions);
     VueOptions.router.onReady(()=>{
