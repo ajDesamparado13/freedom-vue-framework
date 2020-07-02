@@ -1,5 +1,9 @@
 export default function( Vue ){
 
+    if(Vue._response){
+        return;
+    }
+
     Vue._response={
         getData(response,config={}){
             return response.data || {}
