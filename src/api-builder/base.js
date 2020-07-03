@@ -281,6 +281,18 @@ export default function (model={},{resource=null,http=null}) {
             var searches = [];
             for(let key in params){
                 var val = params[key];
+
+                if(val === "" || val === null || typeof val === 'undefined'){
+                    continue;
+                }
+
+                if(Array.isArray(val)){
+                    if(val.length > 0){
+                        searches.push(`${key}:${val.join(',')}`)
+                    }
+                    continue;
+                }
+
                 searches.push(`${key}:${val}`);
             }
             return key+"="+searches.join(';');
