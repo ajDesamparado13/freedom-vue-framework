@@ -5,7 +5,7 @@
 */
 
 import Vue from 'vue';
-const querifyable = ['search','with','searchFields','searchJoin','filter','sortedBy','orderBy'];
+const querifyable = ['search','with','searchFields','searchJoin','filter','sortedBy','orderBy','meta'];
 const file = {
     download(res,file_name=""){
         var blob = res;
