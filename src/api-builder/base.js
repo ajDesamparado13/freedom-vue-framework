@@ -40,13 +40,21 @@ export default function (model={},{resource=null,http=null}) {
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
     }
+    if(resource.startsWith('/')){
+        resource = resource.slice(1,resource.length);
+    }
+
     return Object.assign({
         api_resource:resource,
         getPrefix(){
             return Vue._config.api_prefix;
         },
         getResource(){
-            return this.getPrefix() + this.api_resource;
+            let prefix = this.getPrefix();
+            if(prefix.endsWith('/') ){
+                prefix.substr(0,prefix.length-1)
+            }
+            return prefix + "/" + this.api_resource;
         },
         getHttp(){
             let res = http || Vue.http;
