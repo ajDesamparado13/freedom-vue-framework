@@ -1,7 +1,9 @@
 import response from './response'
+import login from './login'
 
 const HelperUtility = {
     response,
+    login
 }
 
 
