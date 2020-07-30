@@ -33,14 +33,14 @@ export const login = {
 
 export default function( Vue ){
 
-    if(Vue._response){
+    if(Vue._login){
         return;
     }
 
     Vue._login = login
 
     Object.defineProperties(Vue.prototype,{
-        $response:{
+        $login:{
             get:() => {
                 return Vue._login;
             }
