@@ -5,7 +5,6 @@
 */
 
 import Vue from 'vue';
-const querifyable = ['search','with','searchFields','searchJoin','filter','sortedBy','orderBy','meta'];
 const file = {
     download(res,file_name=""){
         var blob = res;
@@ -57,7 +56,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             return prefix + "/" + this.api_resource;
         },
         getQuerifier(){
-            let querifier = querifier || Vue.querifier;
+            let querifier = querifier || Vue._querifier;
             if(querifier === null){
                 console.error('A QUERIFIER UTILITY IS REQUIRED')
                 throw 'A QUERIFIER UTILITY IS REQUIRED'
