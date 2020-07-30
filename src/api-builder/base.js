@@ -35,7 +35,7 @@ const file = {
     },
 }
 
-export default function (model={},{resource=null,http=null}) {
+export default function (model={},{resource=null,http=null,querifier=null}) {
     if(resource === null){
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
@@ -55,6 +55,14 @@ export default function (model={},{resource=null,http=null}) {
                 prefix.substr(0,prefix.length-1)
             }
             return prefix + "/" + this.api_resource;
+        },
+        getQuerifier(){
+            let querifier = querifier || Vue.querifier;
+            if(querifier === null){
+                console.error('A QUERIFIER UTILITY IS REQUIRED')
+                throw 'A QUERIFIER UTILITY IS REQUIRED'
+            }
+            return querifier;
         },
         getHttp(){
             let res = http || Vue.http;
@@ -223,87 +231,10 @@ export default function (model={},{resource=null,http=null}) {
             return fdata;
         },
 
-        /*
-        * GET THE QUERY PARAMETER STRING
-        * IF OBJECT: { search: {field1:value1, field2:value2 }}
-        * TRANSFORMS INTO ?search=field1:value1;field2:value2
-        * IF STRING field1=value1
-        * TRANSFORM INTO ?field1=value1
-        * @returns string
-        */
-        getQueryString(params){
-
-            if(!params){
-                //PARAMETER IS EMPTY RETURN
-                return'';
-            }
-
-            // IF PARAMETER IS ALREADY A STRING THEN SIMPLY RETURN THE STRING
-            if(typeof params == 'string'){
-                return params.indexOf('?')!=-1?params:`?${params}`
-            }
-
-            var queries = []
-            // IF PARAMETER IS AN OBJECT THEN BUILD QUERY STRING FROM OBJECT
-            if(typeof params == 'object'){
-                queries = queries.concat(this.querify(params,0));
-            }
-
-            return queries.length>0?`?${queries.join('&')}`:''
-        },
-        querify(params,level=1,delimeter="="){
-            if(!params){
-                return [];
-            }
-            var queries = [];
-            for(let key in params){
-                var param = params[key];
-                const is_array = Array.isArray(param);
-                const is_queryfyable = querifyable.includes(key);
-                //if(key === 'search'){
-                //    param = encodeURI(param);
-                //}
-                if(typeof param == 'object' && !is_array && is_queryfyable){
-                    queries.push( this.getCriteriaString(param,key) );
-                    continue;
-                }
-
-                if(is_array){
-                    queries.push(`${key}=${param.join( is_queryfyable ? ';' : ',')}`)
-                }
-                else if(typeof param == 'object'){
-                    queries = queries.concat(this.querify(param,level+1));
-                }
-                else if(param || typeof param == 'number'){
-                    queries.push(key+delimeter+param)
-                }
-            }
-            return queries;
-        },
-        /*
-        * TRANSFORMED Criteria Object INTO STRING
-        * refer to http://andersonandra.de/l5-repository/#using-the-requestcriteria for sample query strings
-        * @returns string
-        */
-        getCriteriaString(params,key){
-            var searches = [];
-            for(let key in params){
-                var val = params[key];
-
-                if(val === "" || val === null || typeof val === 'undefined'){
-                    continue;
-                }
-
-                if(Array.isArray(val)){
-                    if(val.length > 0){
-                        searches.push(`${key}:${val.join(',')}`)
-                    }
-                    continue;
-                }
-
-                searches.push(`${key}:${val}`);
-            }
-            return key+"="+searches.join(';');
+        getQueryString(params)
+        {
+            let querifier = this.getQuerifier();
+            return querifier.getQueryString(params)
         },
 
         /*

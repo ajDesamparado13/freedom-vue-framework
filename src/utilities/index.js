@@ -1,9 +1,11 @@
 import response from './response'
 import login from './login'
+import querifier from './querifier'
 
 const HelperUtility = {
     response,
-    login
+    login,
+    querifier,
 }
 
 
