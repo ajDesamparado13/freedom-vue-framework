@@ -31,14 +31,17 @@ const resource_dependency = {
         const storage_key = Vue._config.storage_key;
         if(localStorage[storage_key]){
             const storage = JSON.parse(localStorage[storage_key]);
-            //SETUP AUTHORIZATION BEARER TOKEN
-            var token = storage.Auth.token;
-            if(token){
-                http.defaults.headers.common.Authorization =  'Bearer ' + token
-            }
-            //SETUP CUSTOM HEADERS FROM PRELOAD
-            for(let header in storage.Preload.headers ){
-                http.defaults.headers.common[header] = storage.Preload.headers[header]
+
+            if(storage.Auth){
+                //SETUP AUTHORIZATION BEARER TOKEN
+                var token = storage.Auth.token;
+                if(token){
+                    http.defaults.headers.common.Authorization =  'Bearer ' + token
+                }
+                //SETUP CUSTOM HEADERS FROM PRELOAD
+                for(let header in storage.Preload.headers ){
+                    http.defaults.headers.common[header] = storage.Preload.headers[header]
+                }
             }
         }
 
