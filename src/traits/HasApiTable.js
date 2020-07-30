@@ -21,7 +21,7 @@ export default {
             isLoading ? this.showBlock() : this.closeBlock()
         },
         page(newValue) {
-            if (this.loading) {
+            if (this.loading || !this.dataIsLoaded) {
                 return;
             }
             this.$emit("page:change", newValue);
