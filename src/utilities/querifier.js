@@ -93,6 +93,34 @@ export const querifier = {
         }
         return key+"="+searches.join(';');
     },
+    objectify(queryString){
+        if(!queryString || typeof queryString === 'undefined'){
+            return "";
+        }
+        if(queryString.indexOf('?') === 0 ){
+            queryString = queryString.slice(1);
+        }
+        let query = {}
+        let splits = queryString.split('&');
+        for(let index in splits){
+            let [ queryField,queryValue] = splits[index].split('=');
+
+            if(queryValue.indexOf(':') === -1){
+                query[queryField] = queryValue;
+                continue;
+            }
+
+            let params = queryValue.split(';')
+            let queryObject = {}
+            params.forEach((param)=>{
+                let [field, value] = param.split(':')
+                queryObject[field] = value;
+            })
+
+            query[queryField] = queryObject
+        }
+        return query;
+    }
 }
 
 export default function( Vue ){

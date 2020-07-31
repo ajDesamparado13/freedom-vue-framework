@@ -9,12 +9,14 @@ export default {
             search: {},
             orderBy: {},
             paginationSelector:".ui-pagination",
+            queryString:'',
         }
     },
     props:{
         handler:{ type:Function, required:true, },
         focus: { type: Function, required: false },
         doFocusPagination: { type: Boolean, default: true },
+        doRouterReplace:{type:Boolean, default:true},
     },
     watch:{
         loading(isLoading){
@@ -50,6 +52,12 @@ export default {
         },
     },
     methods:{
+        setQueryString(str){
+            this.queryString = str;
+        },
+        getQueryString(str){
+            return this.queryString;
+        },
         showBlock(){
             this.block = this.$block.show();
         },
@@ -77,7 +85,7 @@ export default {
         async load(params={}){
             this.loading = true;
             let config = Object.assign({},params)
-            config.page = config.page ? config.page : this.page;
+            config.page = config.page || this.page;
             config.search = config.search || this.search;
             config.orderBy = config.orderBy || this.orderBy;
 
@@ -95,9 +103,25 @@ export default {
             }
             this.dataIsLoaded = true;
             this.loading = false;
-            let query = this.$querifier.getQueryString(config,true);
-            let baseUrl = this.$router.options.base || "";
-            history.replaceState({},'',baseUrl + this.$route.path + query)
+            let queryString = this.$querifier.getQueryString(config);
+
+            if(this.doRouterReplace && this.queryString != queryString){
+                this.$router.replace({query:{queryString}}).catch(()=>{});
+            }
+
+            this.queryString = queryString;
+            this.$emit('data:loaded',{queryString,config})
         },
+        initialize(queryString="")
+        {
+            if(!queryString){
+                queryString = this.$route.query.queryString || ""
+            }
+            if( queryString && this.queryString != queryString){
+                this.queryString = queryString
+            }
+            let query = this.$querifier.objectify(this.queryString);
+            this.reload(query);
+        }
     },
 }
