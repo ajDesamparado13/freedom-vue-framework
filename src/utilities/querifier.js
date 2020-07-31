@@ -8,7 +8,7 @@ export const querifier = {
     * TRANSFORM INTO ?field1=value1
     * @returns string
     */
-    getQueryString(params){
+    getQueryString(params,encode=false){
 
         if(!params){
             //PARAMETER IS EMPTY RETURN
@@ -26,7 +26,17 @@ export const querifier = {
             queries = queries.concat(this.querify(params,0));
         }
 
-        return queries.length>0?`?${queries.join('&')}`:''
+        if(queries.length === 0){
+            return '';
+        }
+
+        let queryString = queries.join('&')
+
+        if(encode){
+            queryString =  encodeURIComponent(queryString)
+        }
+
+        return "?" +  queryString
     },
     querify(params,level=1,delimeter="="){
         if(!params){
@@ -35,11 +45,12 @@ export const querifier = {
         var queries = [];
         for(let key in params){
             var param = params[key];
+            if(typeof param === 'function' || typeof param === 'undefined'){
+                continue;
+            }
             const is_array = Array.isArray(param);
             const is_queryfyable = this.querifyable.includes(key);
-            //if(key === 'search'){
-            //    param = encodeURI(param);
-            //}
+
             if(typeof param == 'object' && !is_array && is_queryfyable){
                 queries.push( this.getCriteriaString(param,key) );
                 continue;

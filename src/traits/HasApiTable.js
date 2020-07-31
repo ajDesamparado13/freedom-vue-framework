@@ -80,21 +80,12 @@ export default {
             config.page = config.page ? config.page : this.page;
             config.search = config.search || this.search;
             config.orderBy = config.orderBy || this.orderBy;
-            
+
             this.page = config.page;
             this.search = config.search;
             this.orderBy = config.orderBy;
 
             let focus = config.focus || this.focus;
-
-            var query = {page:this.page,search:this.search,orderBy:this.orderBy};
-            for(let q in query){
-                var que = query[q];
-                if(typeof que == 'object' && Object.keys(que).length==0 || !que){
-                    delete query[q];
-                }
-            }
-
             var promise = this.handler(config);
             if(promise && typeof promise.then == 'function'){
                 this.meta = await promise
@@ -104,7 +95,9 @@ export default {
             }
             this.dataIsLoaded = true;
             this.loading = false;
-            //this.$router.replace({query})
+            let query = this.$querifier.getQueryString(config,true);
+            let baseUrl = this.$router.options.base || "";
+            history.replaceState({},'',baseUrl + this.$route.path + query)
         },
     },
 }
