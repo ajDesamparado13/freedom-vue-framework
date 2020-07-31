@@ -72,9 +72,7 @@ export default {
             });
         },
         reload(params = {}) {
-            let config = Object.assign({search:{},focus:this.focus},params);
-            var page = config.search.page || 1;
-            this.load(Object.assign(params,{page}))
+            this.load(params)
         },
         async load(params={}){
             this.loading = true;
@@ -106,7 +104,7 @@ export default {
             }
             this.dataIsLoaded = true;
             this.loading = false;
-            this.$router.replace({query})
+            //this.$router.replace({query})
         },
     },
 }
