@@ -56,20 +56,20 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             return prefix + "/" + this.api_resource;
         },
         getQuerifier(){
-            let querifier = querifier || Vue._querifier;
-            if(querifier === null){
+            let util = querifier || Vue._querifier;
+            if(util === null){
                 console.error('A QUERIFIER UTILITY IS REQUIRED')
                 throw 'A QUERIFIER UTILITY IS REQUIRED'
             }
-            return querifier;
+            return util;
         },
         getHttp(){
-            let res = http || Vue.http;
-            if(res === null){
+            let util = http || Vue.http;
+            if(util === null){
                 console.error('A HTTP UTILITY IS REQUIRED')
                 throw 'A HTTP UTILITY IS REQUIRED'
             }
-            return res;
+            return util;
         },
         /*
         * EXECUTE A GENERIC API REQUEST
