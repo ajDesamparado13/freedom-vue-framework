@@ -55,14 +55,17 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
     return Object.assign({
         web_resource:resource,
         api_resource:resource,
+        removeSlashPrefix,
+        removeSlashSuffix,
+        appendQueryStringMark,
         getPrefix(useApi=true){
             if(!useApi){
                 return Vue._config.web_prefix || Vue._config.app_url ;
             }
-            Vue._config.api_prefix 
+            return Vue._config.api_prefix 
         },
         getResource(){
-            let prefix = removeSlashSuffix(this.getPrefix());
+            let prefix = this.removeSlashSuffix(this.getPrefix());
             return prefix + "/" + this.api_resource;
         },
         getQuerifier(){
@@ -83,8 +86,8 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         },
         makeUrl(url,params,config={}){
             const useApi = config.useApi || true;
-            const endpoint = url ? removeSlashSuffix(removeSlashPrefix(url)) : "" ;
-            const queryString = params ? appendQueryStringMark(this.getQueryString(params)) : ""
+            const endpoint = url ? this.removeSlashSuffix(this.removeSlashPrefix(url)) : "" ;
+            const queryString = params ? this.appendQueryStringMark(this.getQueryString(params)) : ""
 
             if(!useApi){
                 return this.getPrefix() + "/" + endpoint + queryString;
