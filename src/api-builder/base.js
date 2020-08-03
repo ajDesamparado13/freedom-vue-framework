@@ -53,9 +53,13 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
     resource = removeSlashPrefix(resource);
 
     return Object.assign({
+        web_resource:resource,
         api_resource:resource,
-        getPrefix(){
-            return Vue._config.api_prefix;
+        getPrefix(useApi=true){
+            if(!useApi){
+                return Vue._config.web_prefix || Vue._config.app_url ;
+            }
+            Vue._config.api_prefix 
         },
         getResource(){
             let prefix = removeSlashSuffix(this.getPrefix());
@@ -77,9 +81,15 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             }
             return util;
         },
-        makeUrl(url,params){
+        makeUrl(url,params,config={}){
+            const useApi = config.useApi || true;
             const endpoint = url ? removeSlashSuffix(removeSlashPrefix(url)) : "" ;
             const queryString = params ? appendQueryStringMark(this.getQueryString(params)) : ""
+
+            if(!useApi){
+                return this.getPrefix() + "/" + endpoint + queryString;
+            }
+
             const resource = this.getResource();
             return resource + "/" + endpoint +  queryString
         },
@@ -166,7 +176,8 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         * DOWNLOAD FROM API
         * Intended for download
         */
-        download(url,payload={},params=null){
+        download(endpoint,payload={},params=null){
+            const url = this.makeUrl(endpoint,params,{useApi:false});
             return file.download(this.getHttp().post(url,payload,{responseType:"blob"}));
         },
         /*
