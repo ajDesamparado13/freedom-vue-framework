@@ -34,14 +34,23 @@ const file = {
     },
 }
 
+const appendQueryStringMark = (str) => {
+    return str.startsWith('?') ? str : "?" + str;
+};
+const removeSlashPrefix = (str) =>{
+    return str.startsWith('/') ? str.slice(1,str.length) : str;
+}
+
+const removeSlashSuffix = (str) =>{
+    return str.endsWith('/') ? str.slice(0,str.length - 1) : str;
+}
+
 export default function (model={},{resource=null,http=null,querifier=null}) {
     if(resource === null){
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
     }
-    if(resource.startsWith('/')){
-        resource = resource.slice(1,resource.length);
-    }
+    resource = removeSlashPrefix(resource);
 
     return Object.assign({
         api_resource:resource,
@@ -49,10 +58,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             return Vue._config.api_prefix;
         },
         getResource(){
-            let prefix = this.getPrefix();
-            if(prefix.endsWith('/') ){
-                prefix.substr(0,prefix.length-1)
-            }
+            let prefix = removeSlashSuffix(this.getPrefix());
             return prefix + "/" + this.api_resource;
         },
         getQuerifier(){
@@ -71,17 +77,19 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             }
             return util;
         },
+        makeUrl(url,params){
+            const endpoint = url ? removeSlashSuffix(removeSlashPrefix(url)) : "" ;
+            const queryString = params ? appendQueryStringMark(this.getQueryString(params)) : ""
+            const resource = this.getResource();
+            return resource + "/" + endpoint +  queryString
+        },
         /*
         * EXECUTE A GENERIC API REQUEST
         */
         request(path,options){
             var method = typeof options == 'object' && options.method ? options.method : 'get';
             var params = typeof options == 'object' && options.param ? options.param : "";
-
-            var queryString = params?this.getQueryString(params):"";
-
-            path = path ? "/"+path : "";
-            var url = `${this.getResource()}${path}${queryString}`;
+            let url = this.makeUrl(path,params);
             return this.getHttp()[method](url,{timeout:0});
         },
         /*
@@ -90,7 +98,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         */
         index(params="",config={}){
             var headers = config['headers'] || {}
-            var url = `${this.getResource()}${this.getQueryString(params)}`;
+            const url = this.makeUrl('',params);
             return this.getHttp().get(url,{timeout:0,headers},);
         },
         /*
@@ -104,7 +112,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
                 payload = this.getFormData(payload,'POST')
             }
 
-            var url = `${this.getResource()}${this.getQueryString(params)}`;
+            const url = this.makeUrl('',params);
             return this.getHttp().post(`${url}`,payload,{ headers });
         },
         /*
@@ -113,7 +121,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         */
         destroy(id,params="", config={} ){
             var headers = config['headers'] || {}
-            var url = `${this.getResource()}/${id}${this.getQueryString(params)}`;
+            const url = this.makeUrl(id,params);
             return this.getHttp().delete(`${url}`,{headers});
         },
         /*
@@ -122,7 +130,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         */
         update(id,payload, params="", config={} ){
             var headers = config['headers'] || {}
-            var url = `${this.getResource()}/${id}${this.getQueryString(params)}`;
+            const url = this.makeUrl(id,params);
 
             if(this.form_methods.includes('update')){
                 payload = this.getFormData(payload,'PUT')
@@ -136,17 +144,17 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         */
         show(id,params="",config={}){
             var headers = config['headers'] || {}
-            var url = `${this.getResource()}/${id}${this.getQueryString(params)}`;
+            const url = this.makeUrl(id,params);
             return this.getHttp().get(`${url}`,{headers});
         },
         self(params="",config={}){
             var headers = config['headers'] || {}
-            var url = `${this.getResource()}/self${this.getQueryString(params)}`;
+            const url = this.makeUrl('self',params);
             return this.getHttp().get(`${url}`,{headers});
         },
         selfUpdate(payload, params="", config={} ){
             var headers = config['headers'] || {}
-            var url = `${this.getResource()}/self${this.getQueryString(params)}`;
+            const url = this.makeUrl('self',params);
 
             if(this.form_methods.includes('update')){
                 payload = this.getFormData(payload,'PUT')
@@ -159,7 +167,6 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         * Intended for download
         */
         download(url,payload={},params=null){
-
             return file.download(this.getHttp().post(url,payload,{responseType:"blob"}));
         },
         /*
@@ -169,7 +176,7 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         upload(payload,params,config={}){
             var headers = config['headers'] || {}
             var fdata = this.getFormData(payload);
-            var url = `${this.getResource()}/upload${this.getQueryString(params)}`;
+            const url = this.makeUrl('upload',params);
             return this.getHttp().post(`${url}`,fdata);
         },
         /*
