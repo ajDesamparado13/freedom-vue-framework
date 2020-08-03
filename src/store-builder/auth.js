@@ -59,10 +59,13 @@ export default function(model={},config={}){
             }
         },
         actions : {
-            logout(context,payload){
+            logout(context,payload={}){
+                const preventDefault = payload.preventDefault || false
                 api.logout();
                 context.commit('remove');
-                Vue.bus.emit('logout')
+                if(!preventDefault){
+                    Vue.bus.emit('logout')
+                }
             },
             check(context, payload) {
                 return new Promise( async (resolve,reject)=>{
