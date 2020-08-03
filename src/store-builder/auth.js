@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
 
-export default function(config={}){
+export default function(model={},config={}){
     const api = config.api || null;
     var profile = config.profile || { id:'', first_name: '', last_name: '', email: '', }
 
@@ -10,7 +10,8 @@ export default function(config={}){
         throw 'AN API FOR AUTH IS REQUIRED'
     }
 
-    return {
+
+    return Object.assign({
         namespaced:true,
         state : {
             authenticated: false,
@@ -109,5 +110,5 @@ export default function(config={}){
                 })
             },
         }
-    }
+    },model);
 }
