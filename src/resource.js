@@ -33,7 +33,7 @@ const resource_dependency = {
         const _localStorage = localStorage[storage_key] ? JSON.parse(localStorage[storage_key]) : null;
         const _sessionStorage = sessionStorage[storage_key] ? JSON.parse(sessionStorage[storage_key]) : null;
 
-        const auth_storage = _localStorage.Auth || _sessionStorage.Auth
+        const auth_storage = ( _localStorage && _localStorage.Auth ) || (_sessionStorage && _sessionStorage.Auth)
         if(auth_storage){
             //SETUP AUTHORIZATION BEARER TOKEN
             var token = auth_storage.token;
