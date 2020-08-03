@@ -29,23 +29,27 @@ const resource_dependency = {
 
         //SETUP HEADERS
         const storage_key = Vue._config.storage_key;
-        if(localStorage[storage_key]){
-            const storage = JSON.parse(localStorage[storage_key]);
 
-            if(storage.Auth){
-                //SETUP AUTHORIZATION BEARER TOKEN
-                var token = storage.Auth.token;
-                if(token){
-                    http.defaults.headers.common.Authorization =  'Bearer ' + token
-                }
-                //SETUP CUSTOM HEADERS FROM PRELOAD
-                for(let header in storage.Preload.headers ){
-                    http.defaults.headers.common[header] = storage.Preload.headers[header]
-                }
+        const _localStorage = localStorage[storage_key] ? JSON.parse(localStorage[storage_key]) : null;
+        const _sessionStorage = sessionStorage[storage_key] ? JSON.parse(sessionStorage[storage_key]) : null;
+
+        const auth_storage = _localStorage.Auth || _sessionStorage.Auth
+        if(auth_storage){
+            //SETUP AUTHORIZATION BEARER TOKEN
+            var token = auth_storage.token;
+            if(token){
+                http.defaults.headers.common.Authorization =  'Bearer ' + token
             }
         }
 
-
+        if(_localStorage){
+                if(_localStorage.Preload){
+                    //SETUP CUSTOM HEADERS FROM PRELOAD
+                    for(let header in _localStorage.Preload.headers ){
+                        http.defaults.headers.common[header] = _localStorage.Preload.headers[header]
+                    }
+                }
+        }
 
         http.defaults.baseURL = Vue._config.app_url
         http.defaults.headers.common.Accept =  "application/json"
