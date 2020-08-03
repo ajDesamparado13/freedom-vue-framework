@@ -4,8 +4,8 @@ const defaultOnUnauthenticated = ({store,next,to,from}) => {
 
 }
 
-const withIn = (role,roles)=>{
-    if(role){
+const withIn = (user_role,roles)=>{
+    if(user_role){
         for(let r in roles){
             var role = roles[r];
             if(user_role == role){
