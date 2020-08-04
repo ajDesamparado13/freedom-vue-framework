@@ -10,8 +10,13 @@ export default function(model={},config={}){
         throw 'AN API FOR AUTH IS REQUIRED'
     }
 
+    if(typeof model != 'object' || Array.isArray(model)){
+        console.error('MODEL PARAM MUST BE STORE MODULE OBJECT')
+        throw 'MODEL PARAM MUST BE STORE MODULE OBJECT'
+    }
 
-    return Object.assign({
+
+    let store = {
         namespaced:true,
         state : {
             authenticated: false,
@@ -113,5 +118,14 @@ export default function(model={},config={}){
                 })
             },
         }
-    },model);
+    }
+
+    Object.keys(model).forEach((key)=>{
+        let definition = model[key];
+        if(typeof definition === 'object'){
+            store[key] = Object.assign(store[key],model[key])
+        }
+    })
+
+    return store;
 }
