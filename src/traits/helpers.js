@@ -1,6 +1,4 @@
-export default {
-    getQueryState(queryString="",key="")
-    {
+export const getQueryState = (queryString="",key="") => {
         if(!queryString){
             queryString = this.$route.query.queryString || ""
         }
@@ -9,5 +7,4 @@ export default {
         }
         let state = this.$querifier.objectify(this.queryString);
         return ( key ? state.search[key] : state ) || state
-    },
 }

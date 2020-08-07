@@ -1,6 +1,5 @@
-import HasQueryState from './HasQueryState'
+import {getQueryState} from './helpers'
 export default {
-    mixins:[HasQueryState],
     methods:{
         clear(){
             var search = this.value;
@@ -34,6 +33,7 @@ export default {
                 this.$emit('search',search)
             }
         },
+        getQueryState,
     },
     props:{
         value:{ type:[Object,String], default:'', },

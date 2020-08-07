@@ -1,4 +1,4 @@
-import HasQueryState from './HasQueryState'
+import {getQueryState} from './helpers'
 export default {
     mixins:[HasQueryState],
     data(){
@@ -118,6 +118,7 @@ export default {
         {
             let query = this.getQueryState(queryString);
             this.reload(query);
-        }
+        },
+        getQueryState,
     },
 }
