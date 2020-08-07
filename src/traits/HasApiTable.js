@@ -1,6 +1,5 @@
 import {getQueryState} from './helpers'
 export default {
-    mixins:[HasQueryState],
     data(){
         return {
             block:null,
