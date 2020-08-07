@@ -110,9 +110,9 @@ export default {
             }
 
             this.queryString = queryString;
-            this.$emit('data:loaded',{queryString,config})
+            this.$emit('data:loaded',{queryString,state:config})
         },
-        initialize(queryString="")
+        getQueryState(queryString="")
         {
             if(!queryString){
                 queryString = this.$route.query.queryString || ""
@@ -120,7 +120,11 @@ export default {
             if( queryString && this.queryString != queryString){
                 this.queryString = queryString
             }
-            let query = this.$querifier.objectify(this.queryString);
+            return this.$querifier.objectify(this.queryString);
+        },
+        initialize(queryString)
+        {
+            let query = this.getQueryState(queryString);
             this.reload(query);
         }
     },
