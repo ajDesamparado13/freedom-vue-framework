@@ -1,4 +1,6 @@
+import HasQueryState from './HasQueryState'
 export default {
+    mixins:[HasQueryState],
     data(){
         return {
             block:null,
@@ -111,16 +113,6 @@ export default {
 
             this.queryString = queryString;
             this.$emit('data:loaded',{queryString,state:config})
-        },
-        getQueryState(queryString="")
-        {
-            if(!queryString){
-                queryString = this.$route.query.queryString || ""
-            }
-            if( queryString && this.queryString != queryString){
-                this.queryString = queryString
-            }
-            return this.$querifier.objectify(this.queryString);
         },
         initialize(queryString)
         {
