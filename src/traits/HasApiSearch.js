@@ -1,6 +1,17 @@
-import {getQueryState} from './helpers'
 export default {
+    data(){
+        return {
+            queryString:'',
+        }
+
+    },
     methods:{
+        setQueryString(str){
+            this.queryString = str;
+        },
+        getQueryString(str){
+            return this.queryString;
+        },
         clear(){
             var search = this.value;
             var defaults = this.defaultValues
@@ -33,7 +44,17 @@ export default {
                 this.$emit('search',search)
             }
         },
-        getQueryState,
+        getQueryState  (queryString="",key="") {
+            if(!queryString){
+                queryString = this.$route.query.queryString || ""
+            }
+            if( queryString && this.queryString != queryString){
+                this.queryString = queryString
+            }
+            let state = this.$querifier.objectify(this.queryString);
+            return ( key ? state[key] : state ) || state
+        }
+
     },
     props:{
         value:{ type:[Object,String], default:'', },

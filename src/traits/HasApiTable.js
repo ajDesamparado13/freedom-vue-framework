@@ -1,4 +1,3 @@
-import {getQueryState} from './helpers'
 export default {
     data(){
         return {
@@ -118,6 +117,15 @@ export default {
             let query = this.getQueryState(queryString);
             this.reload(query);
         },
-        getQueryState,
+        getQueryState  (queryString="",key="") {
+            if(!queryString){
+                queryString = this.$route.query.queryString || ""
+            }
+            if( queryString && this.queryString != queryString){
+                this.queryString = queryString
+            }
+            let state = this.$querifier.objectify(this.queryString);
+            return ( key ? state[key] : state ) || state
+        }
     },
 }
