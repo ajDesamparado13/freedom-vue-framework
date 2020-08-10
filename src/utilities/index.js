@@ -1,11 +1,13 @@
 import response from './response'
 import login from './login'
 import querifier from './querifier'
+import mobile from './mobile'
 
 const HelperUtility = {
     response,
     login,
     querifier,
+    mobile,
 }
 
 
