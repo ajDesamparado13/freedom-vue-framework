@@ -13,27 +13,7 @@ router_dependency.install = (Vue,options) => {
     var attachTo = options.attachTo;
     var scroll = {x:0,y:0}
 
-    var base = ""
-    var suffix = options.base || "";
-
-    const domain = Vue._config.app_domain;
-    const url = Vue._config.app_url;
-    const env = Vue._config.app_env;
-
-    if(env == 'production'){
-        if(domain){
-            base = url;
-            base = base.replace(domain,'');
-        }else{
-            base = url;
-            base = base.replace('https://','');
-            base = base.replace('http://','');
-            base = base.substring(base.indexOf('/')+1,base.length);
-        }
-    }
-
-    base += suffix;
-
+    var base = options.base || "";
     const scrollBehavior = (to,from,next)=>{
         return scroll;
     }
