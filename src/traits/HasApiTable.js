@@ -71,6 +71,23 @@ export default {
                 orderBy: this.orderBy
             };
         },
+        setMeta(meta){
+            this.meta = meta;
+        },
+        getMeta(){
+            return this.meta
+        },
+        setParams(params){
+            let config = Object.assign({},params)
+            config.page = config.page || this.page;
+            config.search = config.search || this.search;
+            config.orderBy = config.orderBy || this.orderBy;
+
+            this.page = config.page;
+            this.search = config.search;
+            this.orderBy = config.orderBy;
+            return config
+        },
         focusPagination() {
             this.$nextTick(() => {
                 let el = document.querySelector(this.paginationSelector);
@@ -84,14 +101,7 @@ export default {
         },
         async load(params={}){
             this.loading = true;
-            let config = Object.assign({},params)
-            config.page = config.page || this.page;
-            config.search = config.search || this.search;
-            config.orderBy = config.orderBy || this.orderBy;
-
-            this.page = config.page;
-            this.search = config.search;
-            this.orderBy = config.orderBy;
+            let config = this.setParams(params);
 
             let focus = config.focus || this.focus;
             var promise = this.handler(config);
@@ -110,7 +120,7 @@ export default {
             }
 
             this.queryString = queryString;
-            this.$emit('data:loaded',{queryString,state:config})
+            this.$emit('data:loaded',{queryString,state:config,meta:this.meta})
         },
         initialize(queryString)
         {
