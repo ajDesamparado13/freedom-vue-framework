@@ -1,6 +1,6 @@
 import _config from './config'
 import _vuex from './vuex'
-import _utilities from './utilities'
+import _utilities from 'freedom-js-support/index'
 import _resource from './resource'
 import _dependencies from './dependencies'
 import _router from './router';

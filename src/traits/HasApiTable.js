@@ -113,7 +113,7 @@ export default {
             }
             this.dataIsLoaded = true;
             this.loading = false;
-            let queryString = this.$querifier.getQueryString(config);
+            let queryString = this.$_querifier.getQueryString(config);
 
             if(this.doRouterReplace && this.queryString != queryString){
                 this.$router.replace({query:{queryString}}).catch(()=>{});
@@ -134,7 +134,7 @@ export default {
             if( queryString && this.queryString != queryString){
                 this.queryString = queryString
             }
-            let state = this.$querifier.objectify(this.queryString);
+            let state = this.$_querifier.objectify(this.queryString);
             return ( key ? state[key] : state ) || state
         }
     },
