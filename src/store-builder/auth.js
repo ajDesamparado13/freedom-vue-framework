@@ -26,7 +26,7 @@ export default function(model={},config={}){
             email_remember: '',
         },
         getters : {
-            isAuthenticated(state){return state.authenticated},
+            isAuthenticated(state){return state.authenticated && Boolean(state.token)},
             hasToken(state){return Boolean(state.token)},
             getToken(state){return state.token},
             role(state){return state.role},
@@ -100,16 +100,11 @@ export default function(model={},config={}){
                 })
             },
             login(context, payload) {
-                var next = payload.to;
                 return new Promise((resolve,reject)=>{
                     api.login(payload).then(success=>{
                         payload = success.data;
                         context.commit('set',payload);
-                        if(!next){
-                            Vue.bus.emit('login',payload);
-                        }else{
-                            Vue.bus.emit('login',payload);
-                        }
+                        Vue.bus.emit('login',payload);
                         resolve(payload);
                     },error=>{
                         context.commit('remove');
