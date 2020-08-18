@@ -44,15 +44,14 @@ const removeSlashPrefix = (str) =>{
 const removeSlashSuffix = (str) =>{
     return str.endsWith('/') ? str.slice(0,str.length - 1) : str;
 }
-
-export default function (model={},{resource=null,http=null,querifier=null}) {
+const createBase = ({resource=null,http=null,querifier=null})=>{
     if(resource === null){
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
     }
     resource = removeSlashPrefix(resource);
 
-    return Object.assign({
+    return {
         web_resource:resource,
         api_resource:resource,
         removeSlashPrefix,
@@ -96,6 +95,81 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             const resource = this.getResource();
             return resource + "/" + endpoint +  queryString
         },
+        /*
+        * TRANSFORM A REQUEST PAYLOAD INTO FORM DATA PAYLOAD
+        * Intended for api request with file upload
+        */
+        getFormData(payload,action="POST",simple=true){
+            let fdata = new FormData();
+            var file_keys = this.file_keys;
+            let payload_file_keys  = payload.fileKey.split(';');
+            if(payload_file_keys.length > 0){
+                file_keys = file_keys.concat(payload_file_keys);
+            }
+            var n_payload;
+
+            if(simple){
+                //do simple deep clone with stringify
+                //stringify will convert date/time to string
+                n_payload = JSON.parse(JSON.stringify(payload));
+                n_payload = Object.assign({},payload);
+            }else{
+                //do deep clone of payload
+                //unlike stringify which only clone date/time by string
+            }
+
+            for(let i in file_keys){
+                var key = file_keys[i];
+                if(payload[key]){
+                    var file = payload[key];
+                    delete(n_payload[key]);
+
+                    if(typeof file.name == 'string'){
+                        fdata.append(key,file);
+                    }
+                }
+            }
+
+
+            for ( var key in n_payload) {
+                var load = n_payload[key];
+
+                if(!key || typeof load == 'undefined' || (typeof load == 'string' && load.length==0)){
+                    continue;
+                }
+
+                load = typeof load == 'boolean'?Number(load):load;
+
+                if(Array.isArray(load)){
+                    fdata.append(key,JSON.stringify(load));
+                }else if(typeof load == 'object') {
+                    fdata.append(key, JSON.stringify(load))
+                }else if(typeof load == 'number' || load){
+                    fdata.append(key,load)
+                }
+            }
+
+            fdata.append('_method',action);
+            return fdata;
+        },
+
+        getQueryString(params)
+        {
+            let querifier = this.getQuerifier();
+            return querifier.getQueryString(params)
+        },
+    }
+}
+
+export default function (model={},{resource=null,http=null,querifier=null,baseOnly=false}) {
+
+    let base = createBase({ resource,querifier,http });
+
+    if(baseOnly){
+        return Object.assign(base,model);
+    }
+
+    return Object.assign(base,{
         /*
         * EXECUTE A GENERIC API REQUEST
         */
@@ -193,69 +267,6 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
             const url = this.makeUrl('upload',params);
             return this.getHttp().post(`${url}`,fdata);
         },
-        /*
-        * TRANSFORM A REQUEST PAYLOAD INTO FORM DATA PAYLOAD
-        * Intended for api request with file upload
-        */
-        getFormData(payload,action="POST",simple=true){
-            let fdata = new FormData();
-            var file_keys = this.file_keys;
-            let payload_file_keys  = payload.fileKey.split(';');
-            if(payload_file_keys.length > 0){
-                file_keys = file_keys.concat(payload_file_keys);
-            }
-            var n_payload;
-
-            if(simple){
-                //do simple deep clone with stringify
-                //stringify will convert date/time to string
-                n_payload = JSON.parse(JSON.stringify(payload));
-                n_payload = Object.assign({},payload);
-            }else{
-                //do deep clone of payload
-                //unlike stringify which only clone date/time by string
-            }
-
-            for(let i in file_keys){
-                var key = file_keys[i];
-                if(payload[key]){
-                    var file = payload[key];
-                    delete(n_payload[key]);
-
-                    if(typeof file.name == 'string'){
-                        fdata.append(key,file);
-                    }
-                }
-            }
-
-
-            for ( var key in n_payload) {
-                var load = n_payload[key];
-
-                if(!key || typeof load == 'undefined' || (typeof load == 'string' && load.length==0)){
-                    continue;
-                }
-
-                load = typeof load == 'boolean'?Number(load):load;
-
-                if(Array.isArray(load)){
-                    fdata.append(key,JSON.stringify(load));
-                }else if(typeof load == 'object') {
-                    fdata.append(key, JSON.stringify(load))
-                }else if(typeof load == 'number' || load){
-                    fdata.append(key,load)
-                }
-            }
-
-            fdata.append('_method',action);
-            return fdata;
-        },
-
-        getQueryString(params)
-        {
-            let querifier = this.getQuerifier();
-            return querifier.getQueryString(params)
-        },
 
         /*
         * WHICH PAYLOAD KEY IS A FILE
@@ -266,5 +277,5 @@ export default function (model={},{resource=null,http=null,querifier=null}) {
         *  METHODS THAT WOULD TRANSFORM A REQUEST PAYLOAD INTO FORM DATA PAYLOAD
         */
         form_methods:['upload'],
-    },model)
+    },model);
 }

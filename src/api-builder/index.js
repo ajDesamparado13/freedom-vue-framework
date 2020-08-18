@@ -1,3 +1,3 @@
-import build from './base';
+import build from './builder';
 
 export default build;

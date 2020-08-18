@@ -1,4 +1,3 @@
-import Vue from 'vue';
 const defaultOnUnauthenticated = ({store,next,to,from}) => {
     return { name:'sign-in'}
 
@@ -29,13 +28,14 @@ export default function(_permissions,params={}){
         let context = {store,next,to,from}
         let isAuthenticated = store.getters['Auth/isAuthenticated'];
 
-        if(_permissions === 'authenticated' && isAuthenticated){
-            return next();
-        }
-
-
         if(!isAuthenticated){
             return next(typeof onUnauthenticated == 'function' ? onUnauthenticated(context) : onUnauthenticated);
+        }
+
+        store.dispatch('Auth/check');
+
+        if(_permissions === 'authenticated'){
+            return next();
         }
 
         let role = store.getters['Auth/role'];
