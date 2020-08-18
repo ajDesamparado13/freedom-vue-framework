@@ -65,7 +65,11 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
         },
         getResource(){
             let prefix = this.removeSlashSuffix(this.getPrefix());
-            return prefix + "/" + this.api_resource;
+            let resource = this.api_resource;;
+            if(!resource){
+                return prefix;
+            }
+            return prefix + "/" + resource
         },
         getQuerifier(){
             let util = querifier || Vue._querifier;
