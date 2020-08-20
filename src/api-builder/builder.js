@@ -5,6 +5,8 @@
 */
 
 import Vue from 'vue';
+import { removeSlashPrefix , removeSlashSuffix, appendQueryStringMark} from '../helpers'
+
 const file = {
     download(res,file_name=""){
         var blob = res;
@@ -34,16 +36,7 @@ const file = {
     },
 }
 
-const appendQueryStringMark = (str) => {
-    return str.startsWith('?') ? str : "?" + str;
-};
-const removeSlashPrefix = (str) =>{
-    return str.startsWith('/') ? str.slice(1,str.length) : str;
-}
 
-const removeSlashSuffix = (str) =>{
-    return str.endsWith('/') ? str.slice(0,str.length - 1) : str;
-}
 const createBase = ({resource=null,http=null,querifier=null})=>{
     if(resource === null){
         console.error('A RESOURCE PARAM IS REQUIRED')
