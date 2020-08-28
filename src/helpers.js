@@ -7,13 +7,16 @@ export const removeElement = (element) => {
 }
 
 
-export const appendQueryStringMark = (str) => {
+export const appendQueryStringMark = (value) => {
+    let str = value.toString();
     return str.startsWith('?') ? str : "?" + str;
 };
-export const removeSlashPrefix = (str) =>{
+export const removeSlashPrefix = (value) =>{
+    let str = value.toString();
     return str.startsWith('/') ? str.slice(1,str.length) : str;
 }
 
-export const removeSlashSuffix = (str) =>{
+export const removeSlashSuffix = (value) =>{
+    let str = value.toString();
     return str.endsWith('/') ? str.slice(0,str.length - 1) : str;
 }
