@@ -42,10 +42,14 @@ const vuex_dependency = {
         })
 
         const preload = JSON.parse(localStorage.getItem('preload'));
-
         if(preload){
             for(let key in preload){
-                if(modules[key]){
+                let storeDef = null;
+                key.split('/').forEach((k) => {
+                    storeDef = !storeDef ? Object.assign({},modules[k]) : storeDef.modules[k]
+                })
+
+                if(storeDef){
                     let data = preload[key];
                     store.commit(`${key}/set`,data);
                     delete(preload[key])
@@ -53,6 +57,7 @@ const vuex_dependency = {
             }
             store.commit('Preload/set',preload.data);
         }
+
 
         setTimeout(()=>{
             localStorage.removeItem('preload');
