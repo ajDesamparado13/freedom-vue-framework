@@ -1,6 +1,7 @@
 import _config from './config'
 import _vuex from './vuex'
 import _utilities from 'freedom-js-support/index'
+import { VUE_INSTALLER as _helpers } from './helpers'
 import _resource from './resource'
 import _dependencies from './dependencies'
 import _router from './router';
@@ -12,6 +13,7 @@ installer.install = (Vue,{attachTo={},config={},resource={},router={},vuex={},de
 
     Vue.use(_config,config)
     Vue.use(_utilities,utilities)
+    Vue.use(_helpers,helpers)
 
     Vue.use(_dependencies,dependencies);
     Vue.use(_vuex,vuex)

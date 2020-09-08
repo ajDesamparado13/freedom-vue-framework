@@ -1,5 +1,3 @@
-import { removeSlashPrefix , removeSlashSuffix} from './helpers'
-
 const APP_URL = process.env.MIX_APP_URL;
 const APP_ENV = process.env.MIX_APP_ENV;
 const APP_DEBUG = process.env.MIX_APP_DEBUG;
@@ -19,9 +17,6 @@ const _config = {
     api_prefix : `${APP_URL}/api`,
     web_prefix : `${APP_URL}`,
     storage_prefix : `${APP_URL}`,
-    asset(path=""){
-        return removeSlashSuffix(this.storage_prefix) + "/" + removeSlashPrefix(path)
-    }
 }
 
 export default function( Vue ,config={}){
