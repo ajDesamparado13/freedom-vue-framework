@@ -7,7 +7,7 @@ import _dependencies from './dependencies'
 import _router from './router';
 
 const installer = {};
-installer.install = (Vue,{attachTo={},config={},resource={},router={},vuex={},dependencies={},utilities={}}) => {
+installer.install = (Vue,{attachTo={},config={},resource={},router={},vuex={},dependencies={},utilities={},helpers={}}) => {
     vuex.attachTo = attachTo;
     router.attachTo = attachTo;
 
