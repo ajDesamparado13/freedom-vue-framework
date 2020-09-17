@@ -51,7 +51,7 @@ export default {
             if( queryString && this.queryString != queryString){
                 this.queryString = queryString
             }
-            let state = this.$_querifier.objectify(this.queryString);
+            let state = this.$_querifier.getQueryObject(this.queryString);
             return ( key ? state[key] : state ) || state
         }
 
