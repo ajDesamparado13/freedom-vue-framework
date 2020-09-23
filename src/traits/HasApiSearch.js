@@ -23,6 +23,7 @@ export default {
                 search[key] = "";
             });
             this.search();
+            return search;
         },
         trim(search=this.value){
             Object.keys(search).forEach(( key )=>{
@@ -37,7 +38,7 @@ export default {
             });
             return search;
         },
-        async search(search=this.value,remove_page=true){
+        async search(search=this.value){
             search = this.trim(this.getValues());
             let is_valid = this.$validator.validateAll();
             if(is_valid){
