@@ -7,11 +7,6 @@ const resource_dependency = {
         const http = axios.create({
             baseURL:Vue._config.app_url,
         })
-        //http.defaults.withCredentials = true;
-        //axios.defaults.headers.common = {
-        //    //'X-Requested-With':'XMLHTTPRequest',
-        //}
-
 
         //SET X-CSRF-TOKEN IN HEADERS
         const csrf = document.getElementsByName('x-csrf-token')[0]
@@ -42,13 +37,11 @@ const resource_dependency = {
             }
         }
 
-        if(_localStorage){
-                if(_localStorage.Preload){
-                    //SETUP CUSTOM HEADERS FROM PRELOAD
-                    for(let header in _localStorage.Preload.headers ){
-                        http.defaults.headers.common[header] = _localStorage.Preload.headers[header]
-                    }
-                }
+        if(_localStorage && _localStorage.Preload){
+            //SETUP CUSTOM HEADERS FROM PRELOAD
+            for(let header in _localStorage.Preload.headers ){
+                http.defaults.headers.common[header] = _localStorage.Preload.headers[header]
+            }
         }
 
         http.defaults.baseURL = Vue._config.app_url

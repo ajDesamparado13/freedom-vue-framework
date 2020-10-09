@@ -8,14 +8,10 @@ const debug = false
 const vuex_dependency = {
     install : (Vue,options) => {
         Vue.use(Vuex)
-        var modules = options.modules;
-        modules['Preload'] = preloadStore;
 
-
-        var persistLocal = options.persistLocal;
-        persistLocal.paths.push('Preload');
-        var persistSession = options.persistSession;
-        var attachTo = options.attachTo;
+        const storage_key = Vue._config.storage_key;
+        var persistLocal = Object.assign(options.persistLocal,{ key:storage_key });
+        var persistSession = Object.assign(options.persistSession,{ key:storage_key });
 
         if (!('localStorage' in window)) {
             persistLocal.storage = {
@@ -25,12 +21,10 @@ const vuex_dependency = {
             }
         }
 
+        var modules = Object.assign(options.modules,{ Preload:preloadStore });
+
+        persistLocal.paths.push('Preload');
         persistSession.storage = window.sessionStorage
-
-        const storage_key = Vue._config.storage_key;
-
-        persistLocal.key = storage_key
-        persistSession.key = storage_key
 
         var store = new Vuex.Store({
             modules,
@@ -41,23 +35,16 @@ const vuex_dependency = {
             ]
         })
 
-        const preload = JSON.parse(localStorage.getItem('preload'));
-        if(preload){
-            for(let key in preload){
-                let storeDef = null;
-                key.split('/').forEach((k) => {
-                    storeDef = !storeDef ? Object.assign({},modules[k]) : storeDef.modules[k]
-                })
-
-                if(storeDef){
+        const preload_key = Vue._config.preload_key || 'preload';
+        const preload = JSON.parse(localStorage.getItem(preload_key)) || {};
+        Object.keys(preload).forEach((key)=>{
+                if(store.hasModule(key)){
                     let data = preload[key];
                     store.commit(`${key}/set`,data);
                     delete(preload[key])
                 }
-            }
-            store.commit('Preload/set',preload.data);
-        }
-
+        })
+        store.commit('Preload/set',preload.data);
 
         setTimeout(()=>{
             localStorage.removeItem('preload');
@@ -65,7 +52,7 @@ const vuex_dependency = {
             delete localStorage.preload
         },1000)
 
-        attachTo.store = store;
+        options.attachTo.store = store;
     }
 }
 

@@ -53,13 +53,11 @@ router_dependency.install = (Vue,options) => {
 
             if(typeof match.meta.middleware != 'undefined'){
                 middlewares = middlewares.concat(Array.isArray(match.meta.middleware) ? match.meta.middleware : [ match.meta.middleware])
-
             }
 
         }
         const context = { to,from,next,store:attachTo.store}
         return middlewares[0]({...context,next:routerPipeline(context,middlewares,1)});
-
     });
 
     router.afterEach((router) => {
