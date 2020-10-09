@@ -1,6 +1,6 @@
 {
   "name": "freedom-vue-framework",
-  "version": "1.0.70",
+  "version": "1.0.71",
   "description": "YET ANOTHER VUE-FRAMEWORK",
   "main": "index.js",
   "scripts": {
@@ -38,6 +38,6 @@
     "vuex-persistedstate": "^3.1.0"
   },
   "dependencies": {
-    "freedom-js-support": "^1.0.13"
+    "freedom-js-support": "^1.0.14"
   }
 }
