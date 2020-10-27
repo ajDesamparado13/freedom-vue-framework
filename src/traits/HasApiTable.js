@@ -39,6 +39,8 @@ export default {
             let total = 0;
             if(meta.pagination && meta.pagination.total){
                 total = meta.pagination.total;
+            }else if (meta.total ){
+                total = meta.total
             }
             return total > 0;
         },
