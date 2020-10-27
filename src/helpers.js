@@ -18,7 +18,7 @@ export const removeSlashPrefix = (value) =>{
 
 export const removeSlashSuffix = (value) =>{
     let str = value.toString();
-    return str.charAt(str.length - 1) ? str.slice(0,str.length - 1) : str;
+    return str.charAt(str.length - 1) === '/' ? str.slice(0,str.length - 1) : str;
 }
 
 
