@@ -108,7 +108,6 @@ export default function(action,{defaults=null,block=null}){
         }
     });
 
-    console.log({mutations,getters})
 
     let actions = {
         search(context,payload){
@@ -145,7 +144,6 @@ export default function(action,{defaults=null,block=null}){
                     }
                     return params
                 },{});
-                console.log({params})
 
                 let promise = context.dispatch(action,params, { root:true})
                 promise.then((response)=>{
