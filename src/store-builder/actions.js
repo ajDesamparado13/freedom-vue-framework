@@ -1,28 +1,10 @@
 /*
 * Set the payload with `total` if search is same as previous search
 */
-const set_payload = function({context,params}){
-    const search = context.state.search;
-    if(search){
-        if(params.search === context.state.search){
-            params.total = context.state.meta.total;
-        }
-        if(!params.total){
-            delete params.total;
-        }
-        if(!params.per_page){
-            delete params.per_page;
-        }
-        context.state.search = params.search;
-    }
-}
 
 /*
 * Set the meta after executing a search
 */
-const set_meta = function({context,response}){
-    context.state.meta = response.data.meta;
-}
 
 const model = function({ api={}}) {
     return {
@@ -47,11 +29,9 @@ const model = function({ api={}}) {
             });
         },
         all(context, params) {
-            set_payload({context,params});
             return new Promise((resolve, reject) => {
                 api.all(params).then(
                     response => {
-                        set_meta({ context,response });
                         var items = response.data.data;
                         context.commit("set", items);
                         resolve(response.data);
@@ -67,11 +47,9 @@ const model = function({ api={}}) {
             if (params && params.join) {
                 delete params.join;
             }
-            set_payload({context,params});
             return new Promise((resolve, reject) => {
                 api.index(params).then(
                     response => {
-                        set_meta({ context,response });
                         var items = response.data.data;
                         context.commit(join ? "join" : "set", items);
                         resolve(response.data);

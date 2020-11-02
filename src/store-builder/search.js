@@ -1,25 +1,27 @@
-import camelCase from 'lodash/camelCase'
+import _camelCase from 'lodash/camelCase'
+import _pick from 'lodash/pick'
 import Arr from 'freedom-js-support/src/utilities/arr'
 import Querifier from 'freedom-js-support/src/utilities/querifier'
+import Vue from 'vue';
 
 const addMutation = (mutations,key) => {
-    let type = camelCase(key)
+    let type = _camelCase(key)
     mutations[type] = (state,value) => {
         if(!state.hasOwnProperty(key)){
             return
         }
         if(typeof value !== 'object' || value === null){
-            return  Vue.set(state,key,value) 
+            return  Vue.set(state,key,value)
         }
-        Object.keys(value).forEach((field)=>{ 
-            Vue.set(state[key],field,value[field])  
+        Object.keys(value).forEach((field)=>{
+            Vue.set(state[key],field,value[field])
         });
     }
     return mutations;
 }
 
 const addGetter = (getters,key) => {
-    let type = camelCase(key);
+    let type = _camelCase(key);
 
     getters[type] = (state) => {
         return state[ key ];
@@ -52,10 +54,20 @@ const _defaults = {
     queryString:'',
 }
 
-export default function(action,{defaults=null,block=null}){
-    let state = Object.assign({ },_defaults,defaults);
+export default function(store,config){
+    let handler = Arr.getProperty(config,'handler',null);
+    let block = Arr.getProperty(config,'block',null);
+    let bus = Arr.getProperty(config,'bus','search')
+    let parameters = Arr.getProperty(config,'parameters',[types.PER_PAGE,types.PAGE,types.SEARCH,types.ORDER_BY,types.TOTAL])
+    let defaults = Object.assign(_defaults,store.state);
+    let state = Object.assign({ },defaults);
 
-    let getters = { 
+    if(handler === null){
+        console.error('A SEARCH HANDLER PARAM IS REQUIRED')
+        throw 'A SEARCH HANDLER PARAM IS REQUIRED'
+    }
+
+    let getters = Object.assign({
         from(state){
             return Arr.getProperty(state.meta,'from',0)
         },
@@ -67,6 +79,9 @@ export default function(action,{defaults=null,block=null}){
         },
         lastPage(state){
             return Arr.getProperty(state.meta,'last_page',0)
+        },
+        getParams(state){
+            return _pick(state,parameters);
         },
         getQueryString(state){
             return state['queryString']
@@ -83,8 +98,9 @@ export default function(action,{defaults=null,block=null}){
                 return query;
             },{})
         }
-    }
-    let mutations = { 
+    },store.getters);
+
+    let mutations = Object.assign({
         setQueryString(state){
             let queryables = Object.keys(state).reduce(( queryables,key,index )=>{
                 if(!exclude.includes(key)){
@@ -92,12 +108,12 @@ export default function(action,{defaults=null,block=null}){
                 }
                 return queryables;
             },{});
-            Vue.set(state,'queryString',Querifier.querify(queryables).join('&')) 
+            Vue.set(state,'queryString',Querifier.querify(queryables).join('&'))
         },
         search(state,payload){
             state[types.SEARCH] = {...payload};
         }
-    }
+    },store.mutations)
 
     Object.values(types).forEach((key)=>{
         if(key.indexOf('set') < 0 && !getters.hasOwnProperty(key)){
@@ -109,7 +125,7 @@ export default function(action,{defaults=null,block=null}){
     });
 
 
-    let actions = {
+    let actions = Object.assign({
         search(context,payload){
             context.commit(types.SEARCH,payload);
             context.commit(types.TOTAL,null)
@@ -124,39 +140,38 @@ export default function(action,{defaults=null,block=null}){
             return context.dispatch('handle');
         },
         perPage(context,payload){
-            context.commit(camelCase(types.PER_PAGE),payload);
+            context.commit(_camelCase(types.PER_PAGE),payload);
             return context.dispatch('handle');
         },
         clear({ state }){
-            let original = Object.assign({ },_defaults,defaults);
+            let original = Object.assign({ },defaults);
 
-            Object.keys(state).forEach((field)=>{ 
-                Vue.set(state,field,original[field])  
+            Object.keys(state).forEach((field)=>{
+                Vue.set(state,field,original[field])
             });
+        },
+        recount(state){
+            context.commit(_camelCase(types.TOTAL),undefined)
+            return context.dispatch('handle');
         },
         handle(context,payload={}){
             let process = () => {
                 context.commit(types.SET_PARAMS,payload);
+                let params =  Object.assign(_pick(context.state,parameters),payload);
 
-                let params = Object.keys(context.state).reduce((params,key,index)=>{
-                    if(!exclude.includes(key) || key === 'total' && context.state[key]){
-                        params[key] = context.state[key];
-                    }
-                    return params
-                },{});
-
-                let promise = context.dispatch(action,params, { root:true})
+                let promise = handler(context,params);
                 promise.then((response)=>{
-                    let meta = Arr.getProperty(response,types.META,_defaults[types.META]);
+                    let meta = Arr.getProperty(response,types.META,defaults[types.META]);
                     context.commit(types.META, meta)
-                    context.commit(types.TOTAL, Arr.getProperty(meta,'total',null));
+                    context.commit(types.TOTAL, Arr.getProperty(meta,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
+                    Vue.bus.emit(`${bus}:load`,context.state);
                 })
                 return promise;
             }
             return typeof block === 'function' ? block(process) : process();
         },
-    }
+    },store.actions)
 
     return {
         namespaced:true,
