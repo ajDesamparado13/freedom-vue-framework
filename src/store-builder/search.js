@@ -130,22 +130,27 @@ export default function(store,config){
             context.commit(types.SEARCH,payload);
             context.commit(types.PAGE,1);
             context.commit(types.TOTAL,null)
+            Vue.bus.emit(`${bus}:search`,payload);
             return context.dispatch('handle');
         },
         orderBy(context,payload){
             context.commit(types.ORDER_BY,payload);
+            Vue.bus.emit(`${bus}:orderBy`,payload);
             return context.dispatch('handle');
         },
         page(context,payload){
             context.commit(types.PAGE,payload);
+            Vue.bus.emit(`${bus}:page-change`,payload);
             return context.dispatch('handle');
         },
         perPage(context,payload){
             context.commit(_camelCase(types.PER_PAGE),payload);
+            Vue.bus.emit(`${bus}:per-page-change`,payload);
             return context.dispatch('handle');
         },
         clear({ state }){
             let original = Object.assign({ },defaults);
+            Vue.bus.emit(`${bus}:clear-state`,original);
 
             Object.keys(state).forEach((field)=>{
                 Vue.set(state,field,original[field])
@@ -153,6 +158,7 @@ export default function(store,config){
         },
         recount(state){
             context.commit(_camelCase(types.TOTAL),undefined)
+            Vue.bus.emit(`${bus}:recount`);
             return context.dispatch('handle');
         },
         handle(context,payload={}){
