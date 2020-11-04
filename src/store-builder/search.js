@@ -128,6 +128,7 @@ export default function(store,config){
     let actions = Object.assign({
         search(context,payload){
             context.commit(types.SEARCH,payload);
+            context.commit(types.PAGE,1);
             context.commit(types.TOTAL,null)
             return context.dispatch('handle');
         },
