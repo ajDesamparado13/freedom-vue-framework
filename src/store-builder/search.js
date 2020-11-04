@@ -160,11 +160,15 @@ export default function(store,config){
         },
         clear({ state }){
             let original = Object.assign({ },defaults);
-            Vue.bus.emit(`${bus}:clear-state`,original);
 
             Object.keys(state).forEach((field)=>{
-                Vue.set(state,field,original[field])
+                let value = original[field]
+                Vue.set(state,field,value)
+                if(typeof value === 'object' && value ){
+                    state[field] = Object.assign({},value)
+                }
             });
+            Vue.bus.emit(`${bus}:clear-state`,original);
         },
         recount(state){
             context.commit(_camelCase(types.TOTAL),undefined)
