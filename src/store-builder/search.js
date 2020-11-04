@@ -164,7 +164,7 @@ export default function(store,config){
             Object.keys(state).forEach((field)=>{
                 let value = original[field]
                 Vue.set(state,field,value)
-                if(typeof value === 'object' && value ){
+                if(typeof value === 'object' && value && !Array.isArray(value)){
                     state[field] = Object.assign({},value)
                 }
             });
