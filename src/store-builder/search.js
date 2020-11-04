@@ -52,6 +52,7 @@ const _defaults = {
     total : 0,
     meta: {},
     queryString:'',
+    isLoaded:false,
 }
 
 export default function(store,config){
@@ -97,10 +98,19 @@ export default function(store,config){
                 query[key] = isObject ? Querifier.getCriteriaString(state[key],key,{decode: false, valueOnly:true }) : state[key]
                 return query;
             },{})
+        },
+        isLoaded(state){
+            return state.isLoaded;
         }
     },store.getters);
 
     let mutations = Object.assign({
+        setIsLoaded(state,payload){
+            Vue.set(state,'isLoaded',Boolean(payload));
+        },
+        orderBy(state,payload){
+            Vue.set(state,types.ORDER_BY,payload);
+        },
         setQueryString(state){
             let queryables = Object.keys(state).reduce(( queryables,key,index )=>{
                 if(!exclude.includes(key)){
@@ -172,6 +182,7 @@ export default function(store,config){
                     context.commit(types.META, meta)
                     context.commit(types.TOTAL, Arr.getProperty(meta,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
+                    context.commit('setIsLoaded',true);
                     Vue.bus.emit(`${bus}:load`,context.state);
                 })
                 return promise;
