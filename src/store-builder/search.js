@@ -188,7 +188,8 @@ export default function(store,config){
                     context.commit(types.TOTAL, Arr.getProperty(pagination,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
                     context.commit('setIsLoaded',true);
-                    Vue.bus.emit(`${bus}:load`,context.state);
+
+                    Vue.bus.emit(`${bus}:load`,{ response, state: context.state });
                 })
                 return promise;
             }
