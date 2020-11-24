@@ -183,8 +183,9 @@ export default function(store,config){
                 let promise = handler(context,params);
                 promise.then((response)=>{
                     let meta = Arr.getProperty(response,types.META,defaults[types.META]);
+                    let pagination = Arr.getProperty(meta,'pagination',meta);
                     context.commit(types.META, meta)
-                    context.commit(types.TOTAL, Arr.getProperty(meta,'total',undefined));
+                    context.commit(types.TOTAL, Arr.getProperty(pagination,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
                     context.commit('setIsLoaded',true);
                     Vue.bus.emit(`${bus}:load`,context.state);
