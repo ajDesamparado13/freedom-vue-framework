@@ -184,7 +184,7 @@ export default function(store,config){
                 promise.then((response)=>{
                     let meta = Arr.getProperty(response,types.META,defaults[types.META]);
                     let pagination = Arr.getProperty(meta,'pagination',meta);
-                    context.commit(types.META, meta)
+                    context.commit(types.META, pagination)
                     context.commit(types.TOTAL, Arr.getProperty(pagination,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
                     context.commit('setIsLoaded',true);
