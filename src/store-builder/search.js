@@ -162,6 +162,24 @@ export default function(store,config){
             Vue.bus.emit(`${bus}:page-change`,payload);
             return context.dispatch('handle');
         },
+        previousPage({getters,dispatch}){
+            let page = getters['page'];
+            if(page <= getters['lastPage']){
+                return dispatch('page',--page);
+            }
+            return new Promise((resolve,reject)=>{
+                setTimeout(()=>{ resolve(); },1000)
+            });
+        },
+        nextPage({getters,dispatch}){
+            let page = getters['page'];
+            if(page <= getters['lastPage']){
+                return dispatch('page',++page);
+            }
+            return new Promise((resolve,reject)=>{
+                setTimeout(()=>{ resolve(); },1000)
+            });
+        },
         perPage(context,payload){
             context.commit(_camelCase(types.PER_PAGE),payload);
             Vue.bus.emit(`${bus}:per-page-change`,payload);
