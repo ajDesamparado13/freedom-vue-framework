@@ -115,6 +115,11 @@ export default function(store,config){
         orderBy(state,payload){
             Vue.set(state,types.ORDER_BY,payload);
         },
+        setParams(state,value){
+            Object.keys(value).forEach((field)=>{
+                Vue.set(state,field,value[field])
+            });
+        },
         setQueryString(state){
             let queryables = Object.keys(state).reduce(( queryables,key,index )=>{
                 if(!exclude.includes(key)){

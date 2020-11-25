@@ -1,11 +1,3 @@
-/*
-* Set the payload with `total` if search is same as previous search
-*/
-
-/*
-* Set the meta after executing a search
-*/
-
 const model = function({ api={}}) {
     return {
         set(context,payload){
@@ -52,6 +44,34 @@ const model = function({ api={}}) {
                     response => {
                         var items = response.data.data;
                         context.commit(join ? "join" : "set", items);
+                        resolve(response.data);
+                    },
+                    response => {
+                        reject(response);
+                    }
+                );
+            });
+        },
+        indexSet(context,params){
+            return new Promise((resolve, reject) => {
+                api.index(params).then(
+                    response => {
+                        var items = response.data.data;
+                        context.commit("set", items);
+                        resolve(response.data);
+                    },
+                    response => {
+                        reject(response);
+                    }
+                );
+            });
+        },
+        indexAppend(context,params){
+            return new Promise((resolve, reject) => {
+                api.index(params).then(
+                    response => {
+                        var items = response.data.data;
+                        context.commit("join", items);
                         resolve(response.data);
                     },
                     response => {
