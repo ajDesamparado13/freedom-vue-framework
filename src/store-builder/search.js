@@ -59,7 +59,11 @@ export default function(store,config){
     let handler = Arr.getProperty(config,'handler',null);
     let block = Arr.getProperty(config,'block',null);
     let bus = Arr.getProperty(config,'bus','search')
-    let parameters = Arr.getProperty(config,'parameters',[types.PER_PAGE,types.PAGE,types.SEARCH,types.ORDER_BY,types.TOTAL])
+    let parameters = [types.PER_PAGE,types.PAGE,types.SEARCH,types.ORDER_BY,types.TOTAL]
+        .concat(Arr.getProperty(config,'parameters',[]))
+        .filter((value,index,self)=>{
+            return self.indexOf(value) === index;
+        })
     let defaults = Object.assign(_defaults,store.state);
     let state = Object.assign({ },defaults);
 
@@ -179,6 +183,7 @@ export default function(store,config){
             let process = () => {
                 context.commit(types.SET_PARAMS,payload);
                 let params =  Object.assign(_pick(context.state,parameters),payload);
+                Vue.bus.emit(`${bus}:loading`,{ state: context.state, params } );
 
                 let promise = handler(context,params);
                 promise.then((response)=>{
@@ -188,13 +193,14 @@ export default function(store,config){
                     context.commit(types.TOTAL, Arr.getProperty(pagination,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
                     context.commit('setIsLoaded',true);
-
-                    Vue.bus.emit(`${bus}:load`,{ response, state: context.state });
+                    Vue.bus.emit(`${bus}:load`,{ state: context.state, response} );
+                    Vue.bus.emit(`${bus}:loaded`,{ state: context.state, response} );
                 })
                 return promise;
             }
             return typeof block === 'function' ? block(process) : process();
         },
+
     },store.actions)
 
     return {
