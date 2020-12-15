@@ -4,31 +4,6 @@ import Arr from 'freedom-js-support/src/utilities/arr'
 import Querifier from 'freedom-js-support/src/utilities/querifier'
 import Vue from 'vue';
 
-const addMutation = (mutations,key) => {
-    let type = _camelCase(key)
-    mutations[type] = (state,value) => {
-        if(!state.hasOwnProperty(key)){
-            return
-        }
-        if(typeof value !== 'object' || value === null){
-            return  Vue.set(state,key,value)
-        }
-        Object.keys(value).forEach((field)=>{
-            Vue.set(state[key],field,value[field])
-        });
-    }
-    return mutations;
-}
-
-const addGetter = (getters,key) => {
-    let type = _camelCase(key);
-
-    getters[type] = (state) => {
-        return state[ key ];
-    }
-    return getters;
-}
-
 export const types = {
     PER_PAGE:'per_page',
     PAGE:'page',
@@ -55,7 +30,40 @@ const _defaults = {
     isLoaded:false,
 }
 
-export default function(store,config){
+const addMutation = (mutations,key) => {
+    let type = _camelCase(key)
+    mutations[type] = (state,value) => {
+        if(!state.hasOwnProperty(key)){
+            return
+        }
+        if(typeof value !== 'object' || value === null){
+            return  Vue.set(state,key,value)
+        }
+        Object.keys(value).forEach((field)=>{
+            Vue.set(state[key],field,value[field])
+        });
+    }
+    return mutations;
+}
+
+const addGetter = (getters,key) => {
+    let type = _camelCase(key);
+
+    getters[type] = (state) => {
+        return state[ key ];
+    }
+    return getters;
+}
+
+const setCurrentPage = (context,pagination) => {
+    let current_page = Arr.getProperty(pagination,'current_page',null)
+    if(!current_page){
+        return
+    }
+    context.commit(types.PAGE, current_page)
+}
+
+const builder = function(store,config){
     let handler = Arr.getProperty(config,'handler',null);
     let block = Arr.getProperty(config,'block',null);
     let bus = Arr.getProperty(config,'bus','search')
@@ -163,8 +171,8 @@ export default function(store,config){
             return context.dispatch('handle');
         },
         previousPage({getters,dispatch}){
-            let page = getters['page'];
-            if(page <= getters['lastPage']){
+            let { page, lastPage } = getters;
+            if(page <= lastPage){
                 return dispatch('page',--page);
             }
             return new Promise((resolve,reject)=>{
@@ -172,11 +180,11 @@ export default function(store,config){
             });
         },
         nextPage({getters,dispatch}){
-            let page = getters['page'];
-            if(page <= getters['lastPage']){
+            let { page, lastPage } = getters;
+            if( page <= lastPage){
                 return dispatch('page',++page);
             }
-            return new Promise((resolve,reject)=>{
+            return new Promise((resolve)=>{
                 setTimeout(()=>{ resolve(); },1000)
             });
         },
@@ -197,7 +205,7 @@ export default function(store,config){
             });
             Vue.bus.emit(`${bus}:clear-state`,original);
         },
-        recount(state){
+        recount(context){
             context.commit(_camelCase(types.TOTAL),undefined)
             Vue.bus.emit(`${bus}:recount`);
             return context.dispatch('handle');
@@ -212,6 +220,7 @@ export default function(store,config){
                 promise.then((response)=>{
                     let meta = Arr.getProperty(response,types.META,defaults[types.META]);
                     let pagination = Arr.getProperty(meta,'pagination',meta);
+                    setCurrentPage(context,pagination);
                     context.commit(types.META, pagination)
                     context.commit(types.TOTAL, Arr.getProperty(pagination,'total',undefined));
                     context.commit(types.SET_QUERY_STRING);
@@ -234,4 +243,6 @@ export default function(store,config){
         actions,
     }
 }
+
+export default builder
 
