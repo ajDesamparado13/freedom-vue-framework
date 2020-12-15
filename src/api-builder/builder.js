@@ -5,9 +5,10 @@
 */
 
 import Vue from 'vue';
+import Arr from 'freedom-js-support/src/utilities/arr'
 import { removeSlashPrefix , removeSlashSuffix, appendQueryStringMark} from '../helpers'
 
-const file = {
+export const file = {
     download(res,file_name=""){
         var blob = res;
         if(res && typeof res.blob == 'function' ){
@@ -56,8 +57,9 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
             }
             return Vue._config.api_prefix 
         },
-        getResource(){
-            let prefix = this.removeSlashSuffix(this.getPrefix());
+        getResource(config={}){
+            const useApi = Arr.getProperty(config,'useApi',true);
+            let prefix = this.removeSlashSuffix(this.getPrefix(useApi));
             let resource = this.api_resource;;
             if(!resource){
                 return prefix;
@@ -81,16 +83,10 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
             return util;
         },
         makeUrl(url,params,config={}){
-            const useApi = config.useApi || true;
             const endpoint = url ? this.removeSlashSuffix(this.removeSlashPrefix(url)) : "" ;
             const queryString = params ? this.appendQueryStringMark(this.getQueryString(params)) : ""
 
-            if(!useApi){
-                return this.getPrefix() + "/" + endpoint + queryString;
-            }
-
-            const resource = this.getResource();
-            return resource + "/" + endpoint +  queryString
+            return this.getResource(config) + "/" + endpoint + queryString;
         },
         /*
         * TRANSFORM A REQUEST PAYLOAD INTO FORM DATA PAYLOAD
@@ -197,54 +193,48 @@ export default function (model={},{resource=null,http=null,querifier=null,baseOn
             }
 
             const url = this.makeUrl('',params);
-            return this.getHttp().post(`${url}`,payload,{ headers });
+            return this.getHttp().post(`${url}`,payload,config);
         },
         /*
         * SEND DELETE REQUEST TO  API INDEX
         * Intended for deleting an api resource data
         */
         destroy(id,params="", config={} ){
-            var headers = config['headers'] || {}
             const url = this.makeUrl(id,params);
-            return this.getHttp().delete(`${url}`,{headers});
+            return this.getHttp().delete(`${url}`,config);
         },
         /*
         * SEND PUT REQUEST TO  API INDEX
         * Intended for updating an api resource data
         */
         update(id,payload, params="", config={} ){
-            var headers = config['headers'] || {}
             const url = this.makeUrl(id,params);
 
             if(this.form_methods.includes('update')){
                 payload = this.getFormData(payload,'PUT')
-                return this.getHttp().post(`${url}`,payload,{headers});
             }
-            return this.getHttp().put(`${url}`,payload,{headers});
+            return this.getHttp().put(url,payload,config);
         },
         /*
         * SEND GET REQUEST TO  API SHOW
         * Intended for getting specific api resource data
         */
         show(id,params="",config={}){
-            var headers = config['headers'] || {}
             const url = this.makeUrl(id,params);
-            return this.getHttp().get(`${url}`,{headers});
+            return this.getHttp().get(`${url}`,config);
         },
         self(params="",config={}){
-            var headers = config['headers'] || {}
             const url = this.makeUrl('self',params);
-            return this.getHttp().get(`${url}`,{headers});
+            return this.getHttp().get(`${url}`,config);
         },
         selfUpdate(payload, params="", config={} ){
-            var headers = config['headers'] || {}
             const url = this.makeUrl('self',params);
 
             if(this.form_methods.includes('update')){
                 payload = this.getFormData(payload,'PUT')
-                return this.getHttp().post(`${url}`,payload,{headers});
+                return this.getHttp().post(`${url}`,payload,config);
             }
-            return this.getHttp().put(`${url}`,payload,{headers});
+            return this.getHttp().put(`${url}`,payload,config);
         },
         /*
         * DOWNLOAD FROM API
@@ -259,10 +249,9 @@ export default function (model={},{resource=null,http=null,querifier=null,baseOn
         * Intended for api request with file upload
         */
         upload(payload,params,config={}){
-            var headers = config['headers'] || {}
             var fdata = this.getFormData(payload);
             const url = this.makeUrl('upload',params);
-            return this.getHttp().post(`${url}`,fdata);
+            return this.getHttp().post(`${url}`,fdata,config);
         },
 
         /*
