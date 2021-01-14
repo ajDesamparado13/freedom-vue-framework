@@ -16,8 +16,8 @@ const resource_dependency = {
             baseURL:Vue._config.app_url,
         })
 
-        addInterceptors(http,options,'request');
-        addInterceptors(http,options,'response');
+        addInterceptors(http,'request',options,);
+        addInterceptors(http,'response',options);
 
         //SET X-CSRF-TOKEN IN HEADERS
         const csrf = document.getElementsByName('x-csrf-token')[0]
