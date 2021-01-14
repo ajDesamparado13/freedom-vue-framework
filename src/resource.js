@@ -1,5 +1,13 @@
+import Arr from 'freedom-js-support/src/utilities/arr'
 import {removeElement} from './helpers'
 import axios from 'axios'
+
+const addInterceptors = (http,type,options,) => {
+    let path = ['interceptors',type].join('.');
+    if(Array.isArray(Arr.getProperty(options,path,null))){
+        http.interceptors[type].use(...Arr.getProperty(options,path));
+    }
+}
 
 const resource_dependency = {
     install : (Vue,options) => {
@@ -7,6 +15,9 @@ const resource_dependency = {
         const http = axios.create({
             baseURL:Vue._config.app_url,
         })
+
+        addInterceptors(http,options,'request');
+        addInterceptors(http,options,'response');
 
         //SET X-CSRF-TOKEN IN HEADERS
         const csrf = document.getElementsByName('x-csrf-token')[0]
