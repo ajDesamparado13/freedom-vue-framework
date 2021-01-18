@@ -171,7 +171,33 @@ const model = function({ api={}}) {
         },
         api(context) {
             return api;
-        }
+        },
+        validateAdd(context, datum) {
+            var payload = datum.data ? datum.data : datum;
+            return new Promise((resolve, reject) => {
+                api.store(payload,{_actionName:'validate'}).then(
+                    response => {
+                        resolve(response.data);
+                    },
+                    response => {
+                        reject(response.data);
+                    }
+                );
+            });
+        },
+        validateUpdate(context, datum) {
+            var payload = datum.data ? datum.data : datum;
+            return new Promise((resolve, reject) => {
+                api.update(payload,{_actionName:'validate'}).then(
+                    response => {
+                        resolve(response.data);
+                    },
+                    response => {
+                        reject(response.data);
+                    }
+                );
+            });
+        },
     };
 };
 
@@ -216,23 +242,10 @@ const record =  function({api}){
                 );
             });
         },
-        validateAdd(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            return new Promise((resolve, reject) => {
-                api.store(payload,{_actionName:'validate'}).then(
-                    response => {
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
-            });
-        },
         validateUpdate(context, datum) {
             var payload = datum.data ? datum.data : datum;
             return new Promise((resolve, reject) => {
-                api.update(payload,{_actionName:'validate'}).then(
+                api.selfUpdate(payload,{_actionName:'validate'}).then(
                     response => {
                         resolve(response.data);
                     },
@@ -242,9 +255,7 @@ const record =  function({api}){
                 );
             });
         },
-
     });
-
     return basis;
 }
 
