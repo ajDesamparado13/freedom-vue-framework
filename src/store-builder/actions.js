@@ -167,7 +167,7 @@ const model = function({ api={}}) {
             }
             return new Promise(async (resolve, reject) => {
                 try{
-                    let response = await api.update(id,payload,Object.assign({_actionName:'validate'},params);
+                    let response = await api.update(id,payload,Object.assign({_actionName:'validate'},params));
                     resolve(response.data);
                 }catch(response){
                     reject(response.data);
