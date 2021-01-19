@@ -1,3 +1,5 @@
+import Arr from 'freedom-js-support/src/utilities/arr'
+
 const model = function({ api={}}) {
     return {
         set(context,payload){
@@ -7,163 +9,134 @@ const model = function({ api={}}) {
             });
         },
         find(context, params) {
-            return new Promise((resolve, reject) => {
-                api.find(params).then(
-                    response => {
-                        //var item = response.data.data;
-                        //context.commit('add',item);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = api.find(params)
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
         all(context, params) {
-            return new Promise((resolve, reject) => {
-                api.all(params).then(
-                    response => {
-                        var items = response.data.data;
-                        context.commit("set", items);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.all(params)
+                    context.commit("set", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response);
+                }
             });
         },
         index(context, params) {
-            var join = !params ? false : params.join ? params.join : false;
+            let join = Arr.getProperty(params,'join',false)
             if (params && params.join) {
                 delete params.join;
             }
-            return new Promise((resolve, reject) => {
-                api.index(params).then(
-                    response => {
-                        var items = response.data.data;
-                        context.commit(join ? "join" : "set", items);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.index(params)
+                    context.commit(join ? "join" : "set", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response);
+                }
             });
         },
         indexSet(context,params){
-            return new Promise((resolve, reject) => {
-                api.index(params).then(
-                    response => {
-                        var items = response.data.data;
-                        context.commit("set", items);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.index(params)
+                    context.commit("set", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response);
+                }
             });
         },
         indexAppend(context,params){
-            return new Promise((resolve, reject) => {
-                api.index(params).then(
-                    response => {
-                        var items = response.data.data;
-                        context.commit("join", items);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.index(params)
+                    context.commit("join", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response);
+                }
             });
         },
-        get(context, id) {
-            id = Number(id);
-            return new Promise((resolve, reject) => {
-                api.show(id).then(
-                    response => {
-                        var item = response.data.data;
-                        context.commit("add", item);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
-            });
-        },
-        remove(context, datum) {
-            var rm_id = datum.id ? datum.id : datum;
-            var params = datum.params ? datum.params : null;
-            if (params) {
-                delete rm_id.params;
+        get(context, params) {
+            let id = Arr.getProperty(params,'id',params);
+            if(Arr.hasProperty(params,'id')){
+                delete params.id;
             }
-            return new Promise((resolve, reject) => {
-                api.destroy(rm_id, params).then(
-                    response => {
-                        context.commit("remove", datum);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.show(id,params)
+                    context.commit("add", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
-        update(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            var params = datum.params ? datum.params : null;
-            if (params) {
+        remove(context, payload) {
+            let ids = Arr.getProperty(payload,'id',payload);
+            var params = Arr.getProperty(payload,'params',null)
+            if (params && payload.params) {
                 delete payload.params;
             }
-            return new Promise((resolve, reject) => {
-                api.update(payload.id, payload, params).then(
-                    response => {
-                        var store_payload = response.data.data;
-                        context.commit("update", store_payload);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.destroy(ids, params)
+                    context.commit("remove", payload);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
-        add(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            return new Promise((resolve, reject) => {
-                api.store(payload).then(
-                    response => {
-                        var store_payload = response.data.data;
-                        context.commit("add", store_payload);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
-            });
-        },
-        upload(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            var params = datum.params;
-            if (payload.params) {
+        update(context, payload) {
+            let id = Arr.getProperty(payload,'id',null);
+            let params = Arr.getProperty(payload,'params',null);
+            if (params && payload.params) {
                 delete payload.params;
             }
-            return new Promise((resolve, reject) => {
-                api.upload(payload, params).then(
-                    response => {
-                        var store_payload = response.data.data;
-                        context.commit("add", store_payload);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+            return new Promise(async(resolve, reject) => {
+                try{
+                    let response = await api.update(id, payload, params)
+                    context.commit("update", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
+            });
+        },
+        add(context, payload) {
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.store(payload);
+                    context.commit("add", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data)
+                }
+            });
+        },
+        upload(context, payload) {
+            let params = Arr.getProperty(payload,'params',null)
+            if (params && payload.params) {
+                delete payload.params;
+            }
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.upload(payload, params)
+                    context.commit("add", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
         clear(context) {
@@ -172,30 +145,33 @@ const model = function({ api={}}) {
         api(context) {
             return api;
         },
-        validateAdd(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            return new Promise((resolve, reject) => {
-                api.store(payload,{_actionName:'validate'}).then(
-                    response => {
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+        validateAdd(context, payload) {
+            let params = Arr.getProperty(payload,'params',null)
+            if(params){
+                delete payload.params;
+            }
+            return new Promise(async(resolve, reject) => {
+                try{
+                    let response = await api.store(payload,Object.assign({_actionName:'validate'},params));
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
-        validateUpdate(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            return new Promise((resolve, reject) => {
-                api.update(payload,{_actionName:'validate'}).then(
-                    response => {
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+        validateUpdate(context, payload) {
+            let id = Arr.getProperty(payload,'id');
+            let params = Arr.getProperty(payload,'params',null)
+            if(params && payload.params){
+                delete payload.params;
+            }
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.update(id,payload,Object.assign({_actionName:'validate'},params);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
     };
@@ -208,51 +184,44 @@ const listing = function({api}) {
 const record =  function({api}){
     let basis  = Object.assign((({ api,clear,set,upload })=> ({api,clear,set,upload }))(model({api})),
     {
-        get(context, id) {
-            id = Number(id);
-            return new Promise((resolve, reject) => {
-                api.self().then(
-                    response => {
-                        var item = response.data.data;
-                        context.commit("set", item);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+        get(context, params) {
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.self(params);
+                    context.commit("set", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
-        update(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            var params = datum.params ? datum.params : null;
-            if (params) {
+        update(context, payload) {
+            var params = Arr.getProperty(payload,'params',null)
+            if (params && payload.params) {
                 delete payload.params;
             }
-            return new Promise((resolve, reject) => {
-                api.selfUpdate(payload, params).then(
-                    response => {
-                        var store_payload = response.data.data;
-                        context.commit("set", store_payload);
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+            return new Promise(async (resolve, reject) => {
+                try{
+                    let response = await api.selfUpdate(payload, params)
+                    context.commit("set", response.data.data);
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data);
+                }
             });
         },
-        validateUpdate(context, datum) {
-            var payload = datum.data ? datum.data : datum;
-            return new Promise((resolve, reject) => {
-                api.selfUpdate(payload,{_actionName:'validate'}).then(
-                    response => {
-                        resolve(response.data);
-                    },
-                    response => {
-                        reject(response.data);
-                    }
-                );
+        validateUpdate(context, payload) {
+            let params = Arr.getProperty(payload,'params',null)
+            if(params && payload.params){
+                delete payload.params;
+            }
+            return new Promise( async (resolve, reject) => {
+                try{
+                    let response = await api.selfUpdate(payload,Object.assign({_actionName:'validate'},params));
+                    resolve(response.data);
+                }catch(response){
+                    reject(response.data)
+                }
             });
         },
     });
