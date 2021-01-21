@@ -4,9 +4,6 @@ export default {
             return this.form || {};
         },
         sanitizeValue(value,key){
-            switch(key){
-                case 'status' : value = Array.isArray(value) ? value : value.split(','); break;
-            }
             return value;
         },
         setValue(value,key){
