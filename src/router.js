@@ -1,3 +1,4 @@
+import Arr from 'freedom-js-support/src/utilities/arr'
 import routerPipeline from './routerPipeline'
 
 import VueRouter from 'vue-router'
@@ -9,23 +10,27 @@ router_dependency.install = (Vue,options) => {
 
     Vue.use(VueRouter)
 
-    var routes = options.routes;
     var attachTo = options.attachTo;
-    var scroll = {x:0,y:0}
 
-    var base = options.base || "";
-    const scrollBehavior = (to,from,next)=>{
-        return scroll;
-    }
+    let scrollBehavior= Arr.getProperty(options,'scrollBehavior',(to,from,next)=>{
+        let scrollBehavior = { behavior:'smooth' }
+        if(to.hash){
+            Object.assign(scrollBehavior,{selector:to.hash});
+        }
+        if(to.path != from.path){
+            Object.assign(scrollBehavior,{ x:0, y:0})
+        } 
+        return scrollBehavior;
+    })
 
     var router = new VueRouter({
-        routes,
-        savedPosition:true,
-        base,
-        hashbang: false,
-        history: true,
-        mode: 'history',
-        linkActiveClass: 'active',
+        routes : Arr.getProperty(options,'routes',[]),
+        base: Arr.getProperty(options,'base',''),
+        savedPosition: Arr.getProperty(options,'savedPosition',true),
+        hashbang: Arr.getProperty(options,'hashbang',true),
+        history: Arr.getProperty(options,'history',true),
+        mode: Arr.getProperty(options,'model','history'),
+        linkActiveClass: Arr.getProperty(options,'linkActiveClass','active'),
         scrollBehavior,
     })
 
