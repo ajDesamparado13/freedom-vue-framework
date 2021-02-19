@@ -1,5 +1,5 @@
 import Vue from 'vue'
-
+import Arr from 'freedom-js-support/src/utilities/arr';
 
 export default function(model={},config={}){
     const api = config.api || null;
@@ -35,9 +35,7 @@ export default function(model={},config={}){
         },
         mutations : {
             refresh(state,token){
-                if(token) {
-                    state.token = token
-                }
+                state.token = token
             },
             clear(state){
                 state.token = null;
@@ -47,11 +45,9 @@ export default function(model={},config={}){
             },
             set(state,payload){
                 state.authenticated = true;
-                state.profile = payload.user;
-                state.role = payload.user.role;
-                if(payload.token) {
-                    state.token = payload.token
-                }
+                state.profile = Arr.getProperty(payload,'user',null);
+                state.role = Arr.getProperty(payload,'user.role', Arr.getProperty(payload,'role',''));
+                state.token = Arr.getProperty(payload,'token',null)
             },
             remove(state) {
                 state.authenticated = false
@@ -65,51 +61,49 @@ export default function(model={},config={}){
         },
         actions : {
             logout(context,payload={}){
-                const preventDefault = payload.preventDefault || false
+                const preventDefault = Arr.getProperty(payload,'preventDefault',false)
                 api.logout();
                 context.commit('remove');
                 if(!preventDefault){
                     Vue.bus.emit('logout')
                 }
             },
-            check(context, payload) {
+            check(context) {
                 return new Promise( async (resolve,reject)=>{
-                    if(context.state.authenticated) {
+                    if(context.getters['isAuthenticated']) {
                         try{
-                            let response = await api.check();
-                        }catch(error){
-                        }
+                            await api.check();
+                        }catch(error){ }
                     }
                     resolve();
                 })
             },
-            refresh(context, payload) {
-                return new Promise((resolve,reject)=>{
-                    api.refresh().then(success=>{
-                        var store_payload = success.data['token'];
-                        context.commit('refresh', store_payload)
-                        resolve();
-                    },error=>{
-                        //todo: change code when has more user types
-                        if(context.state.authenticated != true){
+            refresh(context) {
+                return new Promise(async(resolve,reject)=>{
+                    try{
+                        let response = await api.refresh();
+                        context.commit('refresh', Arr.getProperty(response,'data.token',null))
+                        resolve(response);
+                    }catch(error){
+                        if(!context.getters['isAuthenticated']){
                             context.commit('remove')
                             Vue.bus.emit('logout')
                         }
-                        reject();
-                    })
+                        reject(error);
+                    }
                 })
             },
             login(context, payload) {
-                return new Promise((resolve,reject)=>{
-                    api.login(payload).then(success=>{
-                        payload = success.data;
+                return new Promise( async (resolve,reject)=>{
+                    try{
+                        let response = await api.login(payload);
+                        payload = Arr.getProperty(response,'data',payload );
                         context.commit('set',payload);
                         Vue.bus.emit('login',payload);
                         resolve(payload);
-                    },error=>{
-                        context.commit('remove');
-                        reject(error.data);
-                    });
+                    }catch(error){
+                        reject(Arr.getProperty(error,'data',null));
+                    }
                 })
             },
         }
