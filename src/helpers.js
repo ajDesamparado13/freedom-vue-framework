@@ -1,3 +1,5 @@
+import Arr from 'freedom-js-support/src/utilities/arr'
+import Str from 'freedom-js-support/src/utilities/str'
 export const removeElement = (element) => {
     if(typeof element.remove == 'function'){
         return element.remove();
@@ -23,8 +25,8 @@ export const removeSlashSuffix = (value) =>{
 
 
 export const assets = (path="",storage="") => {
-    let storage_path= storage || Vue._config.assets_url || "";
-    return removeSlashSuffix(storage_path) + "/" + removeSlashPrefix(path)
+    let storage_path = Arr.getProperty(Vue._config,`storage.${storage}` , Vue._config.assets_url ) || ""
+    return Str.joinWith(storage_path, path,"/");
 }
 
 
