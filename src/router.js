@@ -61,7 +61,7 @@ router_dependency.install = (Vue,options) => {
             }
 
         }
-        const context = { to,from,next,store:attachTo.store, app:attachTo}
+        const context = { Vue,to,from,next,store:attachTo.store, app:attachTo }
         return middlewares[0]({...context,next:routerPipeline(context,middlewares,1)});
     });
 
