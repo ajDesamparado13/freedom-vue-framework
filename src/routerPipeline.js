@@ -1,13 +1,11 @@
-function pipeline(context,middleware,index){
-    const nextMiddleware = middleware[index];
+function pipeline(context,middlewares,index){
+    const next = middlewares[index];
 
-    if(!nextMiddleware){
-        return context.next;
-    }
+    if(typeof next != 'function') return context.next;
 
     return () => {
-        const nextPipeline = pipeline(context,middleware, index+1)
-        nextMiddleware({...context,next:nextPipeline});
+        const nextPipeline = pipeline(context,middlewares, index+1)
+        return next({...context,next:nextPipeline});
     }
 }
 
