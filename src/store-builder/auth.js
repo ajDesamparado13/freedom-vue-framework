@@ -24,8 +24,10 @@ export default function(model={},config={}){
             token: null,
             role: null,
             email_remember: '',
+            has_verified_2fa:false,
         },
         getters : {
+            hasVerified2FA(state){ return state.has_verified_2fa; },
             isAuthenticated(state){return state.authenticated && Boolean(state.token)},
             hasToken(state){return Boolean(state.token)},
             getToken(state){return state.token},
@@ -34,6 +36,9 @@ export default function(model={},config={}){
             getRememberEmail(state){ return state.email_remember},
         },
         mutations : {
+            hasVerified2FA( state ,value=true){
+                return state.has_verified_2fa = Boolean(value);
+            },
             refresh(state,token){
                 state.token = token
             },
@@ -54,6 +59,7 @@ export default function(model={},config={}){
                 state.profile = profile
                 state.role = null
                 state.token = null
+                state.has_verified_2fa = false
             },
             setEmail(state, email) {
                 state.email_remember = email;

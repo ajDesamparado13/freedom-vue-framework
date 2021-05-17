@@ -17,6 +17,7 @@ const _config = {
     api_prefix : `${APP_URL}/api`,
     web_prefix : `${APP_URL}`,
     storage_prefix : `${APP_URL}`,
+    assets_url : `${APP_URL}`,
 }
 
 export default function( Vue ,config={}){
