@@ -27,7 +27,7 @@ router_dependency.install = (Vue,options) => {
     let domain = Vue._config.app_domain
     let url = Vue._config.app_url 
     if(domain && domain != url ){
-        base = Vue._Str.joinWith(url,base,'/')
+        base = Vue._Str.start(Vue._Str.joinWith(url,base,'/').replace(domain,''),'/');
     }
 
     var router = new VueRouter({
