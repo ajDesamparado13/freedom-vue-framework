@@ -23,15 +23,22 @@ router_dependency.install = (Vue,options) => {
         return scrollBehavior;
     })
 
+    let base = Arr.getProperty(options,'base','');
+    let domain = Vue._config.app_domain
+    let url = Vue._config.app_url 
+    if(domain && domain != url ){
+        base = Vue._Str.joinWith(url,base,'/')
+    }
+
     var router = new VueRouter({
         routes : Arr.getProperty(options,'routes',[]),
-        base: Arr.getProperty(options,'base',''),
         savedPosition: Arr.getProperty(options,'savedPosition',true),
         hashbang: Arr.getProperty(options,'hashbang',true),
         history: Arr.getProperty(options,'history',true),
         mode: Arr.getProperty(options,'model','history'),
         linkActiveClass: Arr.getProperty(options,'linkActiveClass','active'),
         scrollBehavior,
+        base,
     })
 
     let beforeEachList = []

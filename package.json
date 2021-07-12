@@ -38,6 +38,6 @@
     "vuex-persistedstate": "^3.1.0"
   },
   "dependencies": {
-    "freedom-js-support": "^1.0.34"
+    "freedom-js-support": "^1.0.38"
   }
 }
