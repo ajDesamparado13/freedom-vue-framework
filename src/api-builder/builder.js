@@ -79,9 +79,11 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
             return util;
         },
         makeUrl(url,params,config={}){
-            const endpoint = Str.removeEdge(url,'/');
-            const queryString = this.getQueryString(params);
-            return Str.joinWith( this.getResource(config), Str.joinWith( endpoint, queryString, "?" ), '/')
+            const endPoint = Str.joinWith( Str.removeEdge(url,'/'), this.getQueryString(params), "?");
+            if(endPoint == "?"){
+                return this.getResource(config);
+            }
+            return Str.joinWith( this.getResource(config), endPoint , '/')
         },
         getFileKeys(payload){
             return this.file_keys.concat( Arr.getProperty(payload,'fileKey','').split(';'));
@@ -165,8 +167,6 @@ export default function (model={},{resource=null,http=null,querifier=null,baseOn
         * Intended for adding an api resource data
         */
         store(payload,params="",config={}){
-            var headers = config['headers'] || {}
-
             if(this.form_methods.includes('store')){
                 payload = this.getFormData(payload,'POST')
             }
