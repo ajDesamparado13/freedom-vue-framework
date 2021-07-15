@@ -6,7 +6,7 @@
 
 import Vue from 'vue';
 import Arr from 'freedom-js-support/src/utilities/arr'
-import { removeSlashPrefix , removeSlashSuffix, appendQueryStringMark} from '../helpers'
+import Str from 'freedom-js-support/src/utilities/str'
 
 export const file = {
     download(res,file_name=""){
@@ -43,14 +43,11 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
         console.error('A RESOURCE PARAM IS REQUIRED')
         throw 'A RESOURCE PARAM IS REQUIRED'
     }
-    resource = removeSlashPrefix(resource);
+    resource = Str.removePrefix(resource,'/');
 
     return {
         web_resource:resource,
         api_resource:resource,
-        removeSlashPrefix,
-        removeSlashSuffix,
-        appendQueryStringMark,
         getPrefix(useApi=true){
             if(!useApi){
                 return Vue._config.web_prefix || Vue._config.app_url ;
@@ -59,12 +56,11 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
         },
         getResource(config={}){
             const useApi = Arr.getProperty(config,'useApi',true);
-            let prefix = this.removeSlashSuffix(this.getPrefix(useApi));
-            let resource = this.api_resource;;
-            if(!resource){
+            let prefix = this.getPrefix(useApi);
+            if(!this.api_resource){
                 return prefix;
             }
-            return prefix + "/" + resource
+            return Str.joinWith(prefix,this.api_resource,'/');
         },
         getQuerifier(){
             let util = querifier || Vue._querifier;
@@ -83,10 +79,12 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
             return util;
         },
         makeUrl(url,params,config={}){
-            const endpoint = url ? this.removeSlashSuffix(this.removeSlashPrefix(url)) : "" ;
-            const queryString = params ? this.appendQueryStringMark(this.getQueryString(params)) : ""
-
-            return this.getResource(config) + "/" + endpoint + queryString;
+            const endpoint = Str.removeEdge(url,'/');
+            const queryString = this.getQueryString(params);
+            return Str.joinWith( this.getResource(config), Str.joinWith( endpoint, queryString, "?" ), '/')
+        },
+        getFileKeys(payload){
+            return this.file_keys.concat( Arr.getProperty(payload,'fileKey','').split(';'));
         },
         /*
         * TRANSFORM A REQUEST PAYLOAD INTO FORM DATA PAYLOAD
@@ -94,35 +92,17 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
         */
         getFormData(payload,action="POST",simple=true){
             let fdata = new FormData();
-            var file_keys = this.file_keys;
-            let payload_file_keys  = payload.fileKey.split(';');
-            if(payload_file_keys.length > 0){
-                file_keys = file_keys.concat(payload_file_keys);
-            }
-            var n_payload;
+            let n_payload = JSON.parse(JSON.stringify(payload));
 
-            if(simple){
-                //do simple deep clone with stringify
-                //stringify will convert date/time to string
-                n_payload = JSON.parse(JSON.stringify(payload));
-                n_payload = Object.assign({},payload);
-            }else{
-                //do deep clone of payload
-                //unlike stringify which only clone date/time by string
-            }
-
-            for(let i in file_keys){
-                var key = file_keys[i];
-                if(payload[key]){
-                    var file = payload[key];
+            this.getFileKeys(payload).each((key)=>{
+                let file = payload[key];
+                if(file){
                     delete(n_payload[key]);
-
                     if(typeof file.name == 'string'){
                         fdata.append(key,file);
                     }
                 }
-            }
-
+            })
 
             for ( var key in n_payload) {
                 var load = n_payload[key];
@@ -148,8 +128,7 @@ const createBase = ({resource=null,http=null,querifier=null})=>{
 
         getQueryString(params)
         {
-            let querifier = this.getQuerifier();
-            return querifier.getQueryString(params)
+            return this.getQuerifier().getQueryString(params)
         },
     }
 }
