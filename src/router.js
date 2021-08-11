@@ -1,4 +1,5 @@
 import Arr from 'freedom-js-support/src/utilities/arr'
+import Str from 'freedom-js-support/src/utilities/arr'
 import routerPipeline from './routerPipeline'
 
 import VueRouter from 'vue-router'
@@ -24,6 +25,9 @@ router_dependency.install = (Vue,options) => {
     })
 
     let base = Arr.getProperty(options,'base','');
+    if(Vue._config.app_maintenance_mode && Vue._config.app_maintenance_secret){
+        base = Str.joinWith(Vue._config.app_maintenance_secret,base,"/");
+    }
     let domain = Vue._config.app_domain
     let url = Vue._config.app_url 
     if(domain && domain != url ){
