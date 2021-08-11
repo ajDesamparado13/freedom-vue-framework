@@ -15,7 +15,7 @@ const _config = {
     app_url:APP_URL,
     app_debug:APP_DEBUG == "true",
     app_domain:APP_DOMAIN,
-    app_maintenance_mode : APP_MAINTENANCE_MODE == "true",
+    app_maintenance_mode : APP_MAINTENANCE_MODE == "true" || APP_MAINTENANCE_MODE === true,
     app_maintenance_secret : APP_MAINTENANCE_SECRET,
     storage_key:`${APP_NAME}_${APP_VERSION}`,
     api_prefix : `${APP_URL}/api`,

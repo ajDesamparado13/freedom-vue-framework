@@ -1,5 +1,5 @@
 import Arr from 'freedom-js-support/src/utilities/arr'
-import Str from 'freedom-js-support/src/utilities/arr'
+import Str from 'freedom-js-support/src/utilities/str'
 import routerPipeline from './routerPipeline'
 
 import VueRouter from 'vue-router'
@@ -31,7 +31,7 @@ router_dependency.install = (Vue,options) => {
     let domain = Vue._config.app_domain
     let url = Vue._config.app_url 
     if(domain && domain != url ){
-        base = Vue._Str.start(Vue._Str.joinWith(url,base,'/').replace(domain,''),'/');
+        base = Str.start(Str.joinWith(url,base,'/').replace(domain,''),'/');
     }
 
     var router = new VueRouter({
